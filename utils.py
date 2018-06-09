@@ -25,6 +25,10 @@ def find_corr_of(df, target):
             if not math.isnan(corr):
                 yield (col, corr)
 
+def print_corr(df_corr):
+    for col, corr in sorted(list(df_corr), key=lambda x: x[1], reverse=True):
+        print('{}: {:.4f}'.format(col, corr))
+
 def plot_corr(df):
     import matplotlib.pyplot as plt
     import numpy as np
