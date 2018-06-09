@@ -27,13 +27,13 @@ max_min_cols = ['Max_1s_FBM_P_lfwd', 'Max_1s_FBM_P_uaft', 'Max_1s_FBM_P_ufwd',
 
 # Reduce different sensors from the same location to the same columns and print the result.
 transformed_df = utils.transform(df.copy(deep=True), max_min_cols, '{}.*')
-utils.print_data(transformed_df.head(10), 7)
+# utils.print_data(transformed_df.head(10), 7)
 
 # Find the correlation between the speed of the boat with different sensors.
-utils.print_corr(utils.find_corr_of(transformed_df, 'WTP_SelBoatSpd', exclude=['date TU', 'heure TU', 'latitude', 'longitude']))
+utils.write_corr(utils.find_corr_of(transformed_df, 'WTP_SelBoatSpd', exclude=['date TU', 'heure TU', 'latitude', 'longitude']), 'max_min_corr')
 
 # Plot the correlation matrix.
-utils.plot_corr(transformed_df)
+utils.plot_corr(transformed_df, 'max_min_corr')
 
 # Average.
 # The column names to be reduced/combined.
@@ -49,10 +49,10 @@ avg_cols = ['1s_FBM_P_lfwd', '1s_FBM_P_uaft', '1s_FBM_P_ufwd',
 
 # Reduce different sensors from the same location to the same columns and print the result.
 transformed_df = utils.transform(df.copy(deep=True), avg_cols, '.*{}.*')
-utils.print_data(transformed_df.head(10), 7)
+# utils.print_data(transformed_df.head(10), 7)
 
 # Find the correlation between the speed of the boat with different sensors.
-utils.print_corr(utils.find_corr_of(transformed_df, 'WTP_SelBoatSpd', exclude=['date TU', 'heure TU', 'latitude', 'longitude']))
+utils.write_corr(utils.find_corr_of(transformed_df, 'WTP_SelBoatSpd', exclude=['date TU', 'heure TU', 'latitude', 'longitude']), 'avg_corr')
 
 # Plot the correlation matrix.
-utils.plot_corr(transformed_df)
+utils.plot_corr(transformed_df, 'avg_corr')
