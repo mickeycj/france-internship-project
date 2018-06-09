@@ -16,10 +16,10 @@ def print_data(df, steps):
         print('{}\n'.format(df.iloc[:, i:i+steps]))
         i+=steps
 
-def find_corr_of(df, target):
+def find_corr_of(df, target, exclude=[]):
     import math
 
-    for col in df.drop(['date TU', 'heure TU', 'latitude', 'longitude'], axis=1).columns:
+    for col in df.drop(exclude, axis=1).columns:
         if col != target:
             corr = df[target].corr(df[col])
             if not math.isnan(corr):

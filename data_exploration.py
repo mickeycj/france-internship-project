@@ -30,7 +30,7 @@ transformed_df = utils.transform(df.copy(deep=True), max_min_cols, '{}.*')
 utils.print_data(transformed_df.head(10), 7)
 
 # Find the correlation between the speed of the boat with different sensors.
-utils.print_corr(utils.find_corr_of(transformed_df, 'WTP_SelBoatSpd'))
+utils.print_corr(utils.find_corr_of(transformed_df, 'WTP_SelBoatSpd', exclude=['date TU', 'heure TU', 'latitude', 'longitude']))
 
 # Plot the correlation matrix.
 utils.plot_corr(transformed_df)
@@ -52,7 +52,7 @@ transformed_df = utils.transform(df.copy(deep=True), avg_cols, '.*{}.*')
 utils.print_data(transformed_df.head(10), 7)
 
 # Find the correlation between the speed of the boat with different sensors.
-utils.print_corr(utils.find_corr_of(transformed_df, 'WTP_SelBoatSpd'))
+utils.print_corr(utils.find_corr_of(transformed_df, 'WTP_SelBoatSpd', exclude=['date TU', 'heure TU', 'latitude', 'longitude']))
 
 # Plot the correlation matrix.
 utils.plot_corr(transformed_df)
