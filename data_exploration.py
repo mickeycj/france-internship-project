@@ -1,47 +1,8 @@
-import numpy as np
 import pandas as pd
-
-def transform(df, new_cols, regex):
-    for col in new_cols:
-        filtered = df.filter(regex=(regex.format(col)))
-        df[col] = filtered.mean(axis=1)
-        df.drop(filtered.columns, axis=1, inplace=True)
-    return df
-
-def print_data(df, steps):
-    i = 0
-    while i<len(df.keys()):
-        print('{}\n'.format(df.iloc[:, i:i+steps]))
-        i+=steps
-
-def find_corr_of(df, target):
-    import math
-
-    for col in df.drop(['date TU', 'heure TU', 'latitude', 'longitude'], axis=1).columns:
-        if col != target:
-            corr = df[target].corr(df[col])
-            if not math.isnan(corr):
-                yield (col, corr)
-
-def plot_corr(df):
-    import matplotlib.pyplot as plt
-    import seaborn as sns
-
-    _, ax = plt.subplots(figsize=(14, 10))
-    corr = df.corr()
-    sns.heatmap(corr,
-                mask=np.zeros_like(corr, dtype=np.bool),
-                cmap=sns.diverging_palette(220, 10, as_cmap=True),
-                square=True,
-                ax=ax)
-    plt.show()
+import utils
 
 # Read from CSV.
-df = pd.read_csv('./data/datalog-05102017-Full_1Hz.1s_clean.csv', sep=';')
-
-# Show all columns
-# for col in df.columns:
-#     print(col)
+df = utils.read_csv('./data/datalog-05102017-Full_1Hz.1s_clean.csv')
 
 # Max-min.
 # The column names to be reduced/combined.
@@ -65,17 +26,17 @@ max_min_cols = ['Max_1s_FBM_P_lfwd', 'Max_1s_FBM_P_uaft', 'Max_1s_FBM_P_ufwd',
                 'Min_1s_Foil_ELE_LOAD_P', 'Min_1s_Foil_ELE_LOAD_S']
 
 # Reduce different sensors from the same location to the same columns and print the result.
-transformed_df = transform(df.copy(deep=True), max_min_cols, '{}.*')
-print_data(transformed_df.head(10), 7)
+transformed_df = utils.transform(df.copy(deep=True), max_min_cols, '{}.*')
+utils.print_data(transformed_df.head(10), 7)
 
 # Find the correlation between the speed of the boat with different sensors.
-for col, corr in sorted(list(find_corr_of(transformed_df, 'WTP_SelBoatSpd')),
+for col, corr in sorted(list(utils.find_corr_of(transformed_df, 'WTP_SelBoatSpd')),
                         key=lambda x: x[1],
                         reverse=True):
     print('{}: {}'.format(col, corr))
 
 # Plot the correlation matrix.
-plot_corr(transformed_df)
+utils.plot_corr(transformed_df)
 
 # Average.
 # The column names to be reduced/combined.
@@ -90,14 +51,14 @@ avg_cols = ['1s_FBM_P_lfwd', '1s_FBM_P_uaft', '1s_FBM_P_ufwd',
             '1s_Foil_ELE_LOAD_P', '1s_Foil_ELE_LOAD_S']
 
 # Reduce different sensors from the same location to the same columns and print the result.
-transformed_df = transform(df.copy(deep=True), avg_cols, '.*{}.*')
-print_data(transformed_df.head(10), 7)
+transformed_df = utils.transform(df.copy(deep=True), avg_cols, '.*{}.*')
+utils.print_data(transformed_df.head(10), 7)
 
 # Find the correlation between the speed of the boat with different sensors.
-for col, corr in sorted(list(find_corr_of(transformed_df, 'WTP_SelBoatSpd')),
+for col, corr in sorted(list(utils.find_corr_of(transformed_df, 'WTP_SelBoatSpd')),
                         key=lambda x: x[1],
                         reverse=True):
     print('{}: {}'.format(col, corr))
 
 # Plot the correlation matrix.
-plot_corr(transformed_df)
+utils.plot_corr(transformed_df)
