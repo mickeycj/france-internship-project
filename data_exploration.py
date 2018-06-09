@@ -1,8 +1,9 @@
 import pandas as pd
+import sys
 import utils
 
 # Read from CSV.
-df = utils.read_csv('./data/datalog-05102017-Full_1Hz.1s_clean.csv')
+df = utils.read_csv('{}.csv'.format(sys.argv[1]))
 
 # Max-min.
 # The column names to be reduced/combined.
