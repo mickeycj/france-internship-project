@@ -8,16 +8,15 @@ df = utils.read_csv('{}.csv'.format(sys.argv[1]))
 
 # List of relevant features.
 wind_features = ['WTP_AW_angle', 'WTP_AW_speed']
-wind_angle_abs = '{}_abs'.format(wind_features[0])
 
 # Combine positive and negative wind angle.
-df[wind_angle_abs] = df[wind_features[0]].apply(lambda x: abs(x))
+df[wind_features[0]] = df[wind_features[0]].apply(lambda x: abs(x))
 
 # Plot the bins.
 fig = plt.figure()
 ax = fig.gca()
 ax.set_xticks(np.arange(0, 181, 10))
 ax.set_yticks(np.arange(0, 53, 2))
-plt.plot(df[wind_angle_abs].tolist(), df[wind_features[1]].tolist(), 'ko', markersize=0.25)
+plt.plot(df[wind_features[0]].tolist(), df[wind_features[1]].tolist(), 'ko', markersize=0.25)
 plt.grid()
 plt.show()
