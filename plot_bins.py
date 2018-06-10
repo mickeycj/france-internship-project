@@ -1,0 +1,24 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import sys
+import utils
+
+# Read from CSV.
+df = utils.read_csv('{}.csv'.format(sys.argv[1]))
+
+# List of relevant features.
+wind_features = ['WTP_AW_angle', 'WTP_AW_speed']
+wind_angle_abs = '{}_abs'.format(wind_features[0])
+
+# Combine positive and negative wind angle.
+df[wind_angle_abs] = df[wind_features[0]].apply(lambda x: abs(x))
+
+# Plot the bins.
+fig = plt.figure()
+ax = fig.gca()
+ax.set_xticks(np.arange(0, 180, 10))
+ax.set_yticks(np.arange(0, 55, 2))
+plt.plot(df[wind_angle_abs].tolist(), df[wind_features[1]].tolist(), 'ko', markersize=0.25)
+plt.grid()
+plt.show()
