@@ -1,8 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import sys
-import utils
+import sys, utils
 
 # Read from CSV.
 df = utils.read_csv('{}.csv'.format(sys.argv[1]))
