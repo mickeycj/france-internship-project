@@ -26,7 +26,12 @@ def find_corr_of(df, target, exclude=[]):
                 yield (col, corr)
 
 def write_corr(df_corr, fname):
-    with open('./report/{}.csv'.format(fname), 'w') as f:
+    import os
+
+    path = './report'
+    if not os.path.exists(path):
+        os.makedirs(path)
+    with open('{}/{}.csv'.format(path, fname), 'w') as f:
         f.write('feature, corr_with_speed\n')
         for col, corr in sorted(list(df_corr), key=lambda x: x[1], reverse=True):
             f.write('{}, {:.4f}\n'.format(col, corr))
@@ -34,12 +39,16 @@ def write_corr(df_corr, fname):
 def plot_corr(df, fname):
     import matplotlib.pyplot as plt
     import numpy as np
+    import os
     import seaborn as sns
 
+    path = './report'
+    if not os.path.exists(path):
+        os.makedirs(path)
     _, ax = plt.subplots(figsize=(14, 10))
     corr = df.corr()
     sns.heatmap(corr,
                 mask=np.zeros_like(corr, dtype=np.bool),
                 cmap=sns.diverging_palette(220, 10, as_cmap=True),
                 square=True,
-                ax=ax).get_figure().savefig('./report/{}.pdf'.format(fname))
+                ax=ax).get_figure().savefig('{}/{}.pdf'.format(path,fname))
