@@ -27,4 +27,4 @@ plt.grid(which='both')
 path = './report'
 if not os.path.exists(path):
     os.makedirs(path)
-plt.savefig('{}/bins.pdf'.format(path))
+plt.savefig('{}/all_bins.pdf'.format(path))
