@@ -10,33 +10,33 @@ plt.rcParams.update({'figure.max_open_warning': 0})
 wind_features = ['WTP_AW_angle', 'WTP_AW_speed']
 
 # Create bins.
-def create_bins(df, x_steps=10, y_steps=2, outlier_thresh=10, min_thresh=100):
+def create_bins(df, dx=10, dy=2, outlier_thresh=10, min_thresh=100):
     bins = {}
     x, y = 0, 0
     while x <= 180:
         y = 0
         while y <= 52:
-            binned_df = df.query('{0} >= {2} and {0} < {2}+{4} & {1} >= {3} & {1} < {3}+{5}'.format(wind_features[0], wind_features[1], x, y, x_steps, y_steps))
+            binned_df = df.query('{0} >= {2} and {0} < {2}+{4} & {1} >= {3} & {1} < {3}+{5}'.format(wind_features[0], wind_features[1], x, y, dx, dy))
             if len(binned_df) >= outlier_thresh:
                 if len(binned_df) < min_thresh:
-                    return create_bins(df, x_steps+2, y_steps+1)
-                x_end, y_end = x+x_steps, y+y_steps
+                    return create_bins(df, dx+2, dy+1)
+                x_end, y_end = x+dx, y+dy
                 bins['bin_x{}to{}_y{}to{}'.format(x, x_end, y, y_end)] = binned_df
-            y = y+y_steps
-        x = x+x_steps
+            y = y+dy
+        x = x+dx
     if x > 180:
         x = 180
-    return bins, x_steps, y_steps, x, y
+    return bins, dx, dy, x, y
 
 # Plot angle-speed space.
-def plot_angle_speed(df, x_start, y_start, x_finish, y_finish, x_steps, y_steps, markersize, base_path, fname):
+def plot_angle_speed(df, x_start, y_start, x_finish, y_finish, dx, dy, markersize, base_path, fname):
     fig = plt.figure()
     ax = fig.gca()
     plt.xlabel(wind_features[0])
     plt.ylabel(wind_features[1])
     plt.plot(df[wind_features[0]].tolist(), df[wind_features[1]].tolist(), 'ko', markersize=markersize)
-    ax.set_xticks(np.arange(x_start, x_finish, x_steps))
-    ax.set_yticks(np.arange(y_start, y_finish, y_steps))
+    ax.set_xticks(np.arange(x_start, x_finish, dx))
+    ax.set_yticks(np.arange(y_start, y_finish, dy))
     plt.grid(which='both')
     if not os.path.exists(base_path):
         os.makedirs(base_path)
@@ -50,11 +50,11 @@ df = utils.read_csv('{}.csv'.format(sys.argv[1]))
 df.eval('{0} = abs({0})'.format(wind_features[0]), inplace=True)
 
 # Determine the size of the bins.
-bins, x_steps, y_steps, x_max, y_max = create_bins(df)
+bins, dx, dy, x_max, y_max = create_bins(df)
 
 # Plot and save the bins.
 base_path = './report'
-plot_angle_speed(df, 0, 0, x_max+1, y_max+1, x_steps, y_steps, 0.25, base_path, 'bins')
+plot_angle_speed(df, 0, 0, x_max+1, y_max+1, dx, dy, 0.25, base_path, 'bins')
 for bin_name, df in bins.items():
     x_start, x_finish, y_start, y_finish = [int(s) for s in re.findall(r'\d+', bin_name)]
     dx, dy = (x_finish-x_start)/4.0, (y_finish-y_start)/4.0
