@@ -1,8 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import os
 import pandas as pd
-import re, sys, utils
+import os, re, sys, utils
 
 # Ignore PyPlot warning.
 plt.rcParams.update({'figure.max_open_warning': 0})
