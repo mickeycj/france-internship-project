@@ -6,9 +6,9 @@ import os, re, sys, utils
 # Ignore PyPlot warning.
 plt.rcParams.update({'figure.max_open_warning': 0})
 
-# List of relevant features and axes' names.
+# List of relevant features and axis names.
 wind_features = ['WTP_AW_angle', 'WTP_AW_speed']
-axes_names = ['Wind Angle (˚)', 'Wind Speed (knot)']
+axis_names = ['Wind Angle (˚)', 'Wind Speed (knot)']
 
 # Create bins.
 def create_bins(df, dx=10, dy=2, outlier_thresh=10, min_thresh=100):
@@ -32,8 +32,8 @@ def create_bins(df, dx=10, dy=2, outlier_thresh=10, min_thresh=100):
 def plot_angle_speed(df, x_start, y_start, x_finish, y_finish, dx, dy, markersize, base_path, fname):
     fig = plt.figure()
     ax = fig.gca()
-    plt.xlabel(axes_names[0])
-    plt.ylabel(axes_names[1])
+    plt.xlabel(axis_names[0])
+    plt.ylabel(axis_names[1])
     plt.plot(df[wind_features[0]].tolist(), df[wind_features[1]].tolist(), 'ko', markersize=markersize)
     ax.set_xticks(np.arange(x_start, x_finish, dx))
     ax.set_yticks(np.arange(y_start, y_finish, dy))
