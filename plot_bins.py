@@ -55,7 +55,7 @@ bins, dx, dy, max_x, max_y = create_bins(df)
 # Plot and save the bins.
 base_path = './report'
 plot_angle_speed(df, 0, 0, max_x+1, max_y+1, dx, dy, 0.25, base_path, 'bins')
-for bin_name, df in bins.items():
+for bin_name, binned_df in bins.items():
     x_start, x_finish, y_start, y_finish = [int(s) for s in re.findall(r'\d+', bin_name)]
     dx, dy = (x_finish-x_start)/4.0, (y_finish-y_start)/4.0
-    plot_angle_speed(df, x_start, y_start, x_finish+dx, y_finish+dy, dx, dy, 3, base_path, bin_name)
+    plot_angle_speed(binned_df, x_start, y_start, x_finish+dx, y_finish+dy, dx, dy, 3, base_path, bin_name)
