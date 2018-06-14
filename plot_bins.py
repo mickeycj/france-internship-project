@@ -38,7 +38,7 @@ def plot_angle_speed(df, x_start, y_start, x_finish, y_finish, dx, dy, markersiz
     plt.plot(df[wind_features[0]].tolist(), df[wind_features[1]].tolist(), 'ko', markersize=markersize)
     if is_main_plot and x_finish > 181:
         plt.axvline(180, label='Maximum Angle', color='black', lw=1.0, ls='--')
-        plt.legend(loc='best')
+        plt.legend(loc='upper right')
     ax.set_xticks(np.arange(x_start, x_finish, dx))
     ax.set_yticks(np.arange(y_start, y_finish, dy))
     plt.grid(lw=.75)
