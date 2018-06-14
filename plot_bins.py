@@ -60,7 +60,7 @@ for dx, dy, outlier_thresh, min_thresh in bin_properties:
     bins, dx, dy, max_x, max_y = create_bins(df, dx=dx, dy=dy, outlier_thresh=outlier_thresh, min_thresh=min_thresh)
 
     # Plot and save the bins.
-    base_path = './report/outlier{}_min{}'.format(outlier_thresh, min_thresh)
+    base_path = './report/dx{}dy{}outlier{}_min{}'.format(dx, dy, outlier_thresh, min_thresh)
     plot_angle_speed(df, 0, 0, max_x+1, max_y+1, dx, dy, 0.25, base_path, 'bins', is_main_plot=True)
     for bin_name, binned_df in bins.items():
         x_start, x_finish, y_start, y_finish = [int(s) for s in re.findall(r'\d+', bin_name)]
