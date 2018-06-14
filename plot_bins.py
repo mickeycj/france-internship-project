@@ -38,6 +38,7 @@ def plot_angle_speed(df, x_start, y_start, x_finish, y_finish, dx, dy, markersiz
     ax.set_xticks(np.arange(x_start, x_finish, dx))
     ax.set_yticks(np.arange(y_start, y_finish, dy))
     plt.grid(which='both')
+    plt.tight_layout()
     if not os.path.exists(base_path):
         os.makedirs(base_path)
     plt.savefig('{}/{}.pdf'.format(base_path, fname))
