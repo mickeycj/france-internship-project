@@ -6,7 +6,7 @@ import math, os, re, sys, utils
 # Ignore PyPlot warning.
 plt.rcParams.update({'figure.max_open_warning': 0})
 
-# Possible bin angles
+# Possible bin angles.
 bin_angles = [4, 5, 6, 9, 10, 12, 15, 18, 20, 30, 45]
 
 # List of relevant features and axis names.
@@ -51,6 +51,7 @@ df = utils.read_csv('{}.csv'.format(sys.argv[1]))
 # Combine positive and negative wind angle.
 df.eval('{0} = abs({0})'.format(wind_features[0]), inplace=True)
 
+# Create different-sized bins.
 bin_properties = [(1, 10), (3, 50), (10, 100)]
 for outlier_thresh, min_thresh in bin_properties:
     # Determine the size of the bins.
