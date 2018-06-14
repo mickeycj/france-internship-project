@@ -54,13 +54,15 @@ df = utils.read_csv('{}.csv'.format(sys.argv[1]))
 # Combine positive and negative wind angle.
 df.eval('{0} = abs({0})'.format(wind_features[0]), inplace=True)
 
-# Determine the size of the bins.
-bins, dx, dy, max_x, max_y = create_bins(df)
+bin_properties = [(2, 1, 1, 10), (5, 1, 3, 50), (10, 2, 10, 100)]
+for dx, dy, outlier_thresh, min_thresh in bin_properties:
+    # Determine the size of the bins.
+    bins, dx, dy, max_x, max_y = create_bins(df, dx=dx, dy=dy, outlier_thresh=outlier_thresh, min_thresh=min_thresh)
 
-# Plot and save the bins.
-base_path = './report'
-plot_angle_speed(df, 0, 0, max_x+1, max_y+1, dx, dy, 0.25, base_path, 'bins', is_main_plot=True)
-for bin_name, binned_df in bins.items():
-    x_start, x_finish, y_start, y_finish = [int(s) for s in re.findall(r'\d+', bin_name)]
-    dx, dy = (x_finish-x_start)/4.0, (y_finish-y_start)/4.0
-    plot_angle_speed(binned_df, x_start, y_start, x_finish+dx, y_finish+dy, dx, dy, 3, base_path, bin_name)
+    # Plot and save the bins.
+    base_path = './report/outlier{}_min{}'.format(outlier_thresh, min_thresh)
+    plot_angle_speed(df, 0, 0, max_x+1, max_y+1, dx, dy, 0.25, base_path, 'bins', is_main_plot=True)
+    for bin_name, binned_df in bins.items():
+        x_start, x_finish, y_start, y_finish = [int(s) for s in re.findall(r'\d+', bin_name)]
+        dx, dy = (x_finish-x_start)/4.0, (y_finish-y_start)/4.0
+        plot_angle_speed(binned_df, x_start, y_start, x_finish+dx, y_finish+dy, dx, dy, 3, base_path, bin_name)
