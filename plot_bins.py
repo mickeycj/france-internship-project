@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import os, re, sys, utils
+import math, os, re, sys, utils
 
 # Ignore PyPlot warning.
 plt.rcParams.update({'figure.max_open_warning': 0})
@@ -19,7 +19,7 @@ def create_bins(df, dx=bin_angles[0], dy=2, outlier_thresh=10, min_thresh=100, t
     max_x, max_y = 0, 0
     while max_x < 180:
         max_y = 0
-        while max_y < 52:
+        while max_y < math.ceil(df.loc[df[wind_features[1]].idxmax()][wind_features[1]]):
             binned_df = df.query('{0} >= {2} and {0} < {2}+{4} & {1} >= {3} & {1} < {3}+{5}'.format(wind_features[0], wind_features[1], max_x, max_y, dx, dy))
             if len(binned_df) >= outlier_thresh:
                 if len(binned_df) < min_thresh:
