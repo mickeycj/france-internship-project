@@ -53,6 +53,7 @@ def plot_angle_speed(df, x_start, y_start, x_finish, y_finish, dx, dy, markersiz
 # Plot boxplot for speed.
 def plot_boxplot(df, column, outliers, base_path, fname):
     df.boxplot(column=column, showfliers=outliers)
+    plt.xlabel(column)
     create_if_not_exist(base_path)
     plt.savefig('{}/{}.pdf'.format(base_path, fname))
     plt.clf()
