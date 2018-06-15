@@ -11,8 +11,8 @@ bin_angles = [4, 5, 6, 9, 10, 12, 15, 18, 20, 30, 45]
 
 # List of relevant features and axis names.
 wind_features = ['WTP_AW_angle', 'WTP_AW_speed']
-axis_names = ['Wind Angle (˚)', 'Wind Speed (knot)']
-boxplot_feature = 'WTP_SelBoatSpd'
+boat_speed_feature = 'WTP_SelBoatSpd'
+bins_axis_names = ['Wind Angle (˚)', 'Wind Speed (knot)']
 boxplot_axis_name = 'Boat Speed (knot)'
 
 # Create directory if not exist.
@@ -40,8 +40,8 @@ def create_bins(df, dx=bin_angles[0], dy=2, min_thresh=100, tries=0):
 def plot_angle_speed(df, x_start, y_start, x_finish, y_finish, dx, dy, markersize, base_path, fname):
     fig = plt.figure()
     ax = fig.gca()
-    plt.xlabel(axis_names[0])
-    plt.ylabel(axis_names[1])
+    plt.xlabel(bins_axis_names[0])
+    plt.ylabel(bins_axis_names[1])
     plt.plot(df[wind_features[0]].tolist(), df[wind_features[1]].tolist(), 'ko', markersize=markersize)
     ax.set_xticks(np.arange(x_start, x_finish, dx))
     ax.set_yticks(np.arange(y_start, y_finish, dy))
@@ -82,4 +82,4 @@ for min_thresh in bin_sizes:
         x_start, x_finish, y_start, y_finish = [int(s) for s in re.findall(r'\d+', bin_name)]
         dx, dy = (x_finish-x_start)/4.0, (y_finish-y_start)/4.0
         plot_angle_speed(binned_df, x_start, y_start, x_finish+dx, y_finish+dy, dx, dy, 3, bin_base_path, 'bin')
-        plot_boxplot(binned_df, boxplot_feature, False, bin_base_path, 'boxplot')
+        plot_boxplot(binned_df, boat_speed_feature, False, bin_base_path, 'boxplot')
