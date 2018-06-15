@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
-import re, sys, utils
+import numpy as np
+import seaborn as sns
+import math, os, re, sys, utils
 
 # Ignore PyPlot warning.
 plt.rcParams.update({'figure.max_open_warning': 0})
@@ -26,15 +28,11 @@ new_cols = ['1s_FBM_P_lfwd', '1s_FBM_P_uaft', '1s_FBM_P_ufwd',
 
 # Create directory if not exist.
 def create_if_not_exist(path):
-    import os
-
     if not os.path.exists(path):
         os.makedirs(path)
 
 # Create bins.
 def create_bins(df, dx=bin_angles[0], dy=2, min_thresh=100, tries=0):
-    import math
-
     bins = {}
     max_x, max_y = 0, 0
     while max_x < 180:
@@ -51,8 +49,6 @@ def create_bins(df, dx=bin_angles[0], dy=2, min_thresh=100, tries=0):
 
 # Plot wind angle-speed space.
 def plot_wind_angle_speed(df, x_start, y_start, x_finish, y_finish, dx, dy, markersize, base_path, fname):
-    import numpy as np
-
     plt.xlabel(bins_axis_names[0])
     plt.ylabel(bins_axis_names[1])
     plt.plot(df[wind_features[0]].tolist(), df[wind_features[1]].tolist(), 'ko', markersize=markersize)
@@ -76,10 +72,6 @@ def plot_boxplot(df, column, outliers, base_path, fname):
 
 # Plot correlation for boat speed.
 def plot_corr(df, target, base_path, fname,):
-    import math
-    import numpy as np
-    import seaborn as sns
-
     for col in new_cols:
         filtered = df.filter(regex=('.*{}.*'.format(col)))
         df[col] = filtered.mean(axis=1)
