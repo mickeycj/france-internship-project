@@ -38,13 +38,11 @@ def create_bins(df, dx=bin_angles[0], dy=2, min_thresh=100, tries=0):
 
 # Plot angle-speed space.
 def plot_angle_speed(df, x_start, y_start, x_finish, y_finish, dx, dy, markersize, base_path, fname):
-    fig = plt.figure()
-    ax = fig.gca()
     plt.xlabel(bins_axis_names[0])
     plt.ylabel(bins_axis_names[1])
     plt.plot(df[wind_features[0]].tolist(), df[wind_features[1]].tolist(), 'ko', markersize=markersize)
-    ax.set_xticks(np.arange(x_start, x_finish, dx))
-    ax.set_yticks(np.arange(y_start, y_finish, dy))
+    plt.xticks(np.arange(x_start, x_finish, dx))
+    plt.yticks(np.arange(y_start, y_finish, dy))
     plt.grid(lw=.75)
     plt.tight_layout()
     create_if_not_exist(base_path)
