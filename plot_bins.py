@@ -72,6 +72,7 @@ for min_thresh in bin_sizes:
     # Plot and save the bins.
     base_path = './report/min_thresh_{}'.format(min_thresh)
     plot_angle_speed(df, 0, 0, max_x+1, max_y+1, dx, dy, 0.25, base_path, 'bins')
+    base_path = '{}/bins'.format(base_path)
     for bin_name, binned_df in bins.items():
         bin_base_path = '{}/{}'.format(base_path, bin_name)
         x_start, x_finish, y_start, y_finish = [int(s) for s in re.findall(r'\d+', bin_name)]
