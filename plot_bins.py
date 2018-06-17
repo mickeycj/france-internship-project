@@ -34,7 +34,7 @@ def create_if_not_exist(path):
 # Create bins.
 def create_bins(df, dx=bin_angles[0], dy=2, min_thresh=100, tries=0):
     bins = {}
-    max_x, max_y = 0, 0
+    max_x = 0
     while max_x < 180:
         max_y = 0
         while max_y < math.ceil(df.loc[df[wind_features[1]].idxmax()][wind_features[1]]):
