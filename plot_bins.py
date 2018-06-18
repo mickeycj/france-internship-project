@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-import math, os, re, sys, utils
+import math, os, re, sys
 
 # Ignore PyPlot warning.
 plt.rcParams.update({'figure.max_open_warning': 0})
@@ -25,6 +25,12 @@ new_cols = ['1s_FBM_P_lfwd', '1s_FBM_P_uaft', '1s_FBM_P_ufwd',
             '1s_Foil_B_S_01_i', '1s_Foil_B_S_01_o',
             '1s_Foil_ELE_C_01_p', '1s_Foil_ELE_C_01_s',
             '1s_Foil_ELE_LOAD_P', '1s_Foil_ELE_LOAD_S']
+
+# Read CSV file to Pandas Dataframe.
+def read_csv(fname):
+    import pandas as pd
+
+    return pd.read_csv(fname, sep=';')
 
 # Create directory if not exist.
 def create_if_not_exist(path):
@@ -92,7 +98,7 @@ def plot_corr(df, target, base_path, fname,):
     plt.clf()
 
 # Read from CSV.
-df = utils.read_csv('{}.csv'.format(sys.argv[1]))
+df = read_csv('{}.csv'.format(sys.argv[1]))
 
 # Combine positive and negative wind angle.
 df.eval('{0} = abs({0})'.format(wind_features[0]), inplace=True)
