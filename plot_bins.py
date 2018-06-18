@@ -89,6 +89,7 @@ def plot_corr(df, target, base_path, fname,):
                 square=True)
     create_if_not_exist(base_path)
     plt.savefig('{}/{}.pdf'.format(base_path, fname))
+    plt.clf()
 
 # Read from CSV.
 df = utils.read_csv('{}.csv'.format(sys.argv[1]))
