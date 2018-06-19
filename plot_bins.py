@@ -32,6 +32,14 @@ def read_csv(fname):
 
     return pd.read_csv(fname, sep=';')
 
+# Transform the dataset.
+def transform(df, new_cols):
+    for col in new_cols:
+        filtered = df.filter(regex=('.*{}.*'.format(col)))
+        df[col] = filtered.mean(axis=1)
+        df.drop(filtered.columns, axis=1, inplace=True)
+    return df
+
 # Create directory if not exist.
 def create_if_not_exist(path):
     if not os.path.exists(path):
@@ -77,11 +85,7 @@ def plot_boxplot(df, column, outliers, base_path, fname):
     plt.clf()
 
 # Plot correlation for boat speed.
-def plot_corr(df, target, base_path, fname,):
-    for col in new_cols:
-        filtered = df.filter(regex=('.*{}.*'.format(col)))
-        df[col] = filtered.mean(axis=1)
-        df.drop(filtered.columns, axis=1, inplace=True)
+def plot_corr(df, target, base_path, fname):
     cols = []
     for col in df.drop(['date TU', 'heure TU', 'latitude', 'longitude'], axis=1).columns:
         if col != target:
@@ -99,6 +103,9 @@ def plot_corr(df, target, base_path, fname,):
 
 # Read from CSV.
 df = read_csv('{}.csv'.format(sys.argv[1]))
+
+# Transform the dataset to decrease the number of features.
+df = transform(df, new_cols)
 
 # Combine positive and negative wind angle.
 df.eval('{0} = abs({0})'.format(wind_features[0]), inplace=True)
