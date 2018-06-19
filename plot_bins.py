@@ -28,7 +28,7 @@ bins_axis_names = ['Wind Angle (˚)', 'Wind Speed (knot)']
 boxplot_axis_name = 'Boat Speed (knot)'
 
 def read_csv(fname):
-    """Read CSV file to Pandas Dataframe"""
+    """Read a CSV file to a Pandas Dataframe"""
     return pd.read_csv(fname, sep=';')
 
 def transform(df, new_cols):
@@ -40,7 +40,7 @@ def transform(df, new_cols):
     return df
 
 def create_if_not_exist(path):
-    """Create directory if not exist"""
+    """Create a directory if not exist"""
     if not os.path.exists(path):
         os.makedirs(path)
 
@@ -61,7 +61,7 @@ def create_bins(df, dx=bin_angles[0], dy=2, min_thresh=100, tries=0):
     return bins, dx, dy, max_x, max_y
 
 def plot_wind_angle_speed(df, x_start, y_start, x_finish, y_finish, dx, dy, markersize, base_path, fname):
-    """Plot wind angle-speed space"""
+    """Plot the wind angle-speed space"""
     plt.xlabel(bins_axis_names[0])
     plt.ylabel(bins_axis_names[1])
     plt.plot(df[wind_features[0]].tolist(), df[wind_features[1]].tolist(), 'ko', markersize=markersize)
@@ -74,7 +74,7 @@ def plot_wind_angle_speed(df, x_start, y_start, x_finish, y_finish, dx, dy, mark
     plt.clf()
 
 def plot_boxplot(df, column, outliers, base_path, fname):
-    """Plot boxplot for boat speed"""
+    """Plot the boxplot for boat speed"""
     df.boxplot(column=column, showfliers=outliers)
     plt.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
     plt.ylabel(boxplot_axis_name)
@@ -84,7 +84,7 @@ def plot_boxplot(df, column, outliers, base_path, fname):
     plt.clf()
 
 def plot_corr(df, target, base_path, fname):
-    """Plot correlation for boat speed"""
+    """Plot the correlation heatmap for boat speed"""
     cols = []
     for col in df.drop(['date TU', 'heure TU', 'latitude', 'longitude'], axis=1).columns:
         if col != target:
@@ -106,7 +106,7 @@ df = read_csv('{}.csv'.format(sys.argv[1]))
 # Transform the dataset to decrease the number of features.
 df = transform(df, new_cols)
 
-# Combine positive and negative wind angle.
+# Combine positive and negative wind angles.
 df.eval('{0} = abs({0})'.format(wind_features[0]), inplace=True)
 
 # Create different-sized bins.
