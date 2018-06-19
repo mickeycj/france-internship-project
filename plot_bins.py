@@ -6,15 +6,6 @@ import math, os, re, sys
 # Ignore PyPlot warning.
 plt.rcParams.update({'figure.max_open_warning': 0})
 
-# Possible bin angles.
-bin_angles = [4, 5, 6, 9, 10, 12, 15, 18, 20, 30, 45]
-
-# List of relevant features and axis names.
-wind_features = ['WTP_AW_angle', 'WTP_AW_speed']
-boat_speed_feature = 'WTP_SelBoatSpd'
-bins_axis_names = ['Wind Angle (˚)', 'Wind Speed (knot)']
-boxplot_axis_name = 'Boat Speed (knot)'
-
 # Target columns to transform to.
 new_cols = ['1s_FBM_P_lfwd', '1s_FBM_P_uaft', '1s_FBM_P_ufwd',
             '1s_FBM_S_laft', '1s_FBM_S_lfwd', '1s_FBM_S_uaft', '1s_FBM_S_ufwd',
@@ -26,27 +17,36 @@ new_cols = ['1s_FBM_P_lfwd', '1s_FBM_P_uaft', '1s_FBM_P_ufwd',
             '1s_Foil_ELE_C_01_p', '1s_Foil_ELE_C_01_s',
             '1s_Foil_ELE_LOAD_P', '1s_Foil_ELE_LOAD_S']
 
-# Read CSV file to Pandas Dataframe.
+# Possible bin angles.
+bin_angles = [4, 5, 6, 9, 10, 12, 15, 18, 20, 30, 45]
+
+# List of relevant features and axis names.
+wind_features = ['WTP_AW_angle', 'WTP_AW_speed']
+boat_speed_feature = 'WTP_SelBoatSpd'
+bins_axis_names = ['Wind Angle (˚)', 'Wind Speed (knot)']
+boxplot_axis_name = 'Boat Speed (knot)'
+
 def read_csv(fname):
+    """Read CSV file to Pandas Dataframe"""
     import pandas as pd
 
     return pd.read_csv(fname, sep=';')
 
-# Transform the dataset.
 def transform(df, new_cols):
+    """Transform the dataset"""
     for col in new_cols:
         filtered = df.filter(regex=('.*{}.*'.format(col)))
         df[col] = filtered.mean(axis=1)
         df.drop(filtered.columns, axis=1, inplace=True)
     return df
 
-# Create directory if not exist.
 def create_if_not_exist(path):
+    """Create directory if not exist"""
     if not os.path.exists(path):
         os.makedirs(path)
 
-# Create bins.
 def create_bins(df, dx=bin_angles[0], dy=2, min_thresh=100, tries=0):
+    """Create bins"""
     bins = {}
     max_x = 0
     while max_x < 180:
@@ -61,8 +61,8 @@ def create_bins(df, dx=bin_angles[0], dy=2, min_thresh=100, tries=0):
         max_x+=dx
     return bins, dx, dy, max_x, max_y
 
-# Plot wind angle-speed space.
 def plot_wind_angle_speed(df, x_start, y_start, x_finish, y_finish, dx, dy, markersize, base_path, fname):
+    """Plot wind angle-speed space"""
     plt.xlabel(bins_axis_names[0])
     plt.ylabel(bins_axis_names[1])
     plt.plot(df[wind_features[0]].tolist(), df[wind_features[1]].tolist(), 'ko', markersize=markersize)
@@ -74,8 +74,8 @@ def plot_wind_angle_speed(df, x_start, y_start, x_finish, y_finish, dx, dy, mark
     plt.savefig('{}/{}.pdf'.format(base_path, fname))
     plt.clf()
 
-# Plot boxplot for boat speed.
 def plot_boxplot(df, column, outliers, base_path, fname):
+    """Plot boxplot for boat speed"""
     df.boxplot(column=column, showfliers=outliers)
     plt.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
     plt.ylabel(boxplot_axis_name)
@@ -84,8 +84,8 @@ def plot_boxplot(df, column, outliers, base_path, fname):
     plt.savefig('{}/{}.pdf'.format(base_path, fname))
     plt.clf()
 
-# Plot correlation for boat speed.
 def plot_corr(df, target, base_path, fname):
+    """Plot correlation for boat speed"""
     cols = []
     for col in df.drop(['date TU', 'heure TU', 'latitude', 'longitude'], axis=1).columns:
         if col != target:
