@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import seaborn as sns
 import math, os, re, sys
 
@@ -28,8 +29,6 @@ boxplot_axis_name = 'Boat Speed (knot)'
 
 def read_csv(fname):
     """Read CSV file to Pandas Dataframe"""
-    import pandas as pd
-
     return pd.read_csv(fname, sep=';')
 
 def transform(df, new_cols):
