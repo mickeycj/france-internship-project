@@ -72,6 +72,24 @@ def plot_boxplot(df, column, outliers, base_path, fname):
     plt.savefig('{}/{}.pdf'.format(base_path, fname))
     plt.clf()
 
+def plot_corr(df, target, base_path, fname):
+    """Plot the correlations with boat speed"""
+    corrs = {}
+    for col in df.drop(['date TU', 'heure TU', 'latitude', 'longitude'], axis=1).columns:
+        if col != target:
+            corr = df[target].corr(df[col])
+            if not math.isnan(corr):
+                corrs[col] = corr
+    cols = [target] + [i[0] for i in sorted(corrs.items(), key=lambda x: x[1], reverse=True)][:20]
+    corr = df[cols].corr()
+    sns.heatmap(corr, xticklabels=corr.columns, yticklabels=corr.columns, lw=.75)
+    plt.xticks(rotation=30, ha='right', fontsize=5)
+    plt.yticks(fontsize=5)
+    plt.tight_layout()
+    create_if_not_exist(base_path)
+    plt.savefig('{}/{}.pdf'.format(base_path, fname))
+    plt.clf()
+
 # Read from CSV.
 df = read_csv('{}.csv'.format(sys.argv[1]))
 
@@ -107,3 +125,4 @@ for min_thresh in bin_sizes:
         dx, dy = (x_finish-x_start)/4.0, (y_finish-y_start)/4.0
         plot_wind_angle_speed(binned_df, x_start, y_start, x_finish+dx, y_finish+dy, dx, dy, 3, bin_base_path, 'bin')
         plot_boxplot(binned_df, boat_speed_feature, False, bin_base_path, 'boxplot')
+        plot_corr(binned_df, boat_speed_feature, bin_base_path, 'corr')
