@@ -64,9 +64,9 @@ def plot_wind_angle_speed(df, x_start, y_start, x_finish, y_finish, dx, dy, mark
     plt.savefig('{}/{}.pdf'.format(base_path, fname))
     plt.clf()
 
-def plot_boxplot(df, column, outliers, base_path, fname):
+def plot_boxplot(df, base_path, fname):
     """Plot the boxplot for boat speed"""
-    df.boxplot(column=column, showfliers=outliers)
+    df.boxplot(column=boat_speed_feature, showfliers=df[boat_speed_feature].median() == df[boat_speed_feature].mode().iloc[0])
     plt.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
     plt.ylabel(boxplot_axis_name)
     plt.tight_layout()
@@ -74,17 +74,17 @@ def plot_boxplot(df, column, outliers, base_path, fname):
     plt.savefig('{}/{}.pdf'.format(base_path, fname))
     plt.clf()
 
-def plot_corr(df, target, base_path, fname):
+def plot_corr(df, base_path, fname):
     """Plot the correlations with boat speed"""
     corrs = {}
     for col in df.drop(['date TU', 'heure TU', 'latitude', 'longitude'], axis=1).columns:
-        if col != target:
-            corr = df[target].corr(df[col])
+        if col != boat_speed_feature:
+            corr = df[boat_speed_feature].corr(df[col])
             if not math.isnan(corr):
                 corrs[col] = corr
     sorted_corrs = sorted(corrs.items(), key=lambda x: abs(x[1]), reverse=True)[:20]
     sorted_corrs = sorted(sorted_corrs, key=lambda x: x[1], reverse=True)
-    cols = [target] + [i[0] for i in sorted_corrs]
+    cols = [boat_speed_feature] + [i[0] for i in sorted_corrs]
     corr = df[cols].corr()
     sns.heatmap(corr, xticklabels=corr.columns, yticklabels=corr.columns, lw=.75)
     plt.xticks(rotation=30, ha='right', fontsize=5)
@@ -128,5 +128,5 @@ for min_thresh in bin_sizes:
         x_start, x_finish, y_start, y_finish = [int(s) for s in re.findall(r'\d+', bin_name)]
         dx, dy = (x_finish-x_start)/4.0, (y_finish-y_start)/4.0
         plot_wind_angle_speed(binned_df, x_start, y_start, x_finish+dx, y_finish+dy, dx, dy, 3, bin_base_path, 'bin')
-        plot_boxplot(binned_df, boat_speed_feature, False, bin_base_path, 'boxplot')
-        plot_corr(binned_df, boat_speed_feature, bin_base_path, 'corr')
+        plot_boxplot(binned_df, bin_base_path, 'boxplot')
+        plot_corr(binned_df, bin_base_path, 'corr')
