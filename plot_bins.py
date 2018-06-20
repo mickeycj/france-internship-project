@@ -82,7 +82,9 @@ def plot_corr(df, target, base_path, fname):
             corr = df[target].corr(df[col])
             if not math.isnan(corr):
                 corrs[col] = corr
-    cols = [target] + [i[0] for i in sorted(corrs.items(), key=lambda x: x[1], reverse=True)][:20]
+    sorted_corrs = sorted(corrs.items(), key=lambda x: abs(x[1]), reverse=True)[:20]
+    sorted_corrs = sorted(sorted_corrs, key=lambda x: x[1], reverse=True)
+    cols = [target] + [i[0] for i in sorted_corrs]
     corr = df[cols].corr()
     sns.heatmap(corr, xticklabels=corr.columns, yticklabels=corr.columns, lw=.75)
     plt.xticks(rotation=30, ha='right', fontsize=5)
