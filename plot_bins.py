@@ -30,8 +30,8 @@ def transform_columns(df, new_cols, regex):
     split = len(cols)-len(new_cols)
     return df[cols[:4] + cols[split:] + cols[4:split]]
 
-def combine_angles(df):
-    """Combine positive and negative angles"""
+def abs_angles(df):
+    """Return absolute values of the angle features"""
     for col in df.filter(regex=('.*_angle')).columns:
         df.eval('{0} = abs({0})'.format(col), inplace=True)
 
@@ -115,8 +115,8 @@ df = transform_columns(df,
                     '1s_Foil_ELE_LOAD_P', '1s_Foil_ELE_LOAD_S'],
                     '.*{}.*')
 
-# Combine positive and negative angles.
-combine_angles(df)
+# Compute absolute values of the angles.
+abs_angles(df)
 
 # Create different-sized bins.
 bin_sizes = [10, 50, 100]
