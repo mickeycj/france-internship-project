@@ -20,13 +20,15 @@ def read_csv(fname):
     """Read a CSV file to a Pandas Dataframe"""
     return pd.read_csv(fname, sep=';')
 
-def transform(df, new_cols, regex):
+def transform_columns(df, new_cols, regex):
     """Transform the dataset"""
     for col in new_cols:
         filtered = df.filter(regex=(regex.format(col)))
         df[col] = filtered.mean(axis=1)
         df.drop(filtered.columns, axis=1, inplace=True)
-    return df
+    cols = df.columns.values.tolist()
+    split = len(cols)-len(new_cols)
+    return df[cols[:4] + cols[split:] + cols[4:split]]
 
 def create_if_not_exist(path):
     """Create a directory if not exist"""
@@ -94,17 +96,17 @@ def plot_corr(df, target, base_path, fname):
 df = read_csv('{}.csv'.format(sys.argv[1]))
 
 # Transform the dataset to decrease the number of features.
-df = transform(df,
-            ['1s_FBM_P_lfwd', '1s_FBM_P_uaft', '1s_FBM_P_ufwd',
-            '1s_FBM_S_laft', '1s_FBM_S_lfwd', '1s_FBM_S_uaft', '1s_FBM_S_ufwd',
-            '1s_HUL_C_lport', '1s_HUL_C_lstbd', '1s_HUL_C_uport', '1s_HUL_C_ustbd',
-            '1s_HUL_P_lport', '1s_HUL_P_lstbd', '1s_HUL_P_uport', '1s_HUL_P_ustbd',
-            '1s_HUL_S_lport', '1s_HUL_S_lstbd', '1s_HUL_S_uport', '1s_HUL_S_ustbd',
-            '1s_Foil_B_P_01_i', '1s_Foil_B_P_01_o',
-            '1s_Foil_B_S_01_i', '1s_Foil_B_S_01_o',
-            '1s_Foil_ELE_C_01_p', '1s_Foil_ELE_C_01_s',
-            '1s_Foil_ELE_LOAD_P', '1s_Foil_ELE_LOAD_S'],
-            '.*{}.*')
+df = transform_columns(df,
+                    ['1s_FBM_P_lfwd', '1s_FBM_P_uaft', '1s_FBM_P_ufwd',
+                    '1s_FBM_S_laft', '1s_FBM_S_lfwd', '1s_FBM_S_uaft', '1s_FBM_S_ufwd',
+                    '1s_HUL_C_lport', '1s_HUL_C_lstbd', '1s_HUL_C_uport', '1s_HUL_C_ustbd',
+                    '1s_HUL_P_lport', '1s_HUL_P_lstbd', '1s_HUL_P_uport', '1s_HUL_P_ustbd',
+                    '1s_HUL_S_lport', '1s_HUL_S_lstbd', '1s_HUL_S_uport', '1s_HUL_S_ustbd',
+                    '1s_Foil_B_P_01_i', '1s_Foil_B_P_01_o',
+                    '1s_Foil_B_S_01_i', '1s_Foil_B_S_01_o',
+                    '1s_Foil_ELE_C_01_p', '1s_Foil_ELE_C_01_s',
+                    '1s_Foil_ELE_LOAD_P', '1s_Foil_ELE_LOAD_S'],
+                    '.*{}.*')
 
 # Combine positive and negative wind angles.
 df.eval('{0} = abs({0})'.format(wind_features[0]), inplace=True)
