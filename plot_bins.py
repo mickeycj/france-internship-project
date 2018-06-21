@@ -1,8 +1,12 @@
+import math
+import os
+import re
+import sys
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import math, os, re, sys
 
 # Ignore PyPlot warning.
 plt.rcParams.update({'figure.max_open_warning': 0})
