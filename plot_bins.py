@@ -8,7 +8,7 @@ import math, os, re, sys
 plt.rcParams.update({'figure.max_open_warning': 0})
 
 # Possible bin angles.
-bin_angles = [4, 5, 6, 9, 10, 12, 15, 18, 20, 30, 45]
+bin_angles = [5, 6, 8, 9, 10, 12, 15, 18, 20, 24, 30, 36, 40, 45, 60, 72]
 
 # List of relevant features and axis names.
 wind_features = ['WTP_AW_angle', 'WTP_AW_speed']
@@ -20,37 +20,33 @@ def read_csv(fname):
     """Read a CSV file to a Pandas Dataframe"""
     return pd.read_csv(fname, sep=';')
 
-def transform_columns(df, new_cols, regex):
+def transform_columns(df, new_cols, additional_cols, regex):
     """Transform the dataset"""
-    for col in new_cols:
-        filtered = df.filter(regex=(regex.format(col)))
-        df[col] = filtered.mean(axis=1)
-        df.drop(filtered.columns, axis=1, inplace=True)
-    cols = df.columns.values.tolist()
-    split = len(cols)-len(new_cols)
-    return df[cols[:4] + cols[split:] + cols[4:split]]
-
-def abs_angles(df):
-    """Return absolute values of the angle features"""
-    for col in df.filter(regex=('.*_angle')).columns:
-        df.eval('{0} = abs({0})'.format(col), inplace=True)
+    transformed_df = pd.DataFrame()
+    for col in new_cols + additional_cols:
+        if col not in additional_cols:
+            filtered = df.filter(regex=(regex.format(col)))
+            transformed_df[col] = filtered.mean(axis=1)
+        else:
+            transformed_df[col] = df[col]
+    return transformed_df
 
 def create_if_not_exist(path):
     """Create a directory if not exist"""
     if not os.path.exists(path):
         os.makedirs(path)
 
-def create_bins(df, dx=bin_angles[0], dy=2, min_thresh=100, tries=0):
+def create_bins(df, dx=bin_angles[0], dy=1, min_thresh=10, tries=0):
     """Create bins"""
     bins = {}
-    max_x = 0
+    max_x = -180
     while max_x < 180:
         max_y = 0
         while max_y < math.ceil(df.loc[df[wind_features[1]].idxmax()][wind_features[1]]):
             binned_df = df.query('{0} >= {2} and {0} < {2}+{4} & {1} >= {3} & {1} < {3}+{5}'.format(wind_features[0], wind_features[1], max_x, max_y, dx, dy))
             if len(binned_df) >= int(math.ceil(min_thresh * 0.1)):
                 if len(binned_df) < min_thresh:
-                    return create_bins(df, dx=bin_angles[tries+1], dy=dy+2, min_thresh=min_thresh, tries=tries+1)
+                    return create_bins(df, dx=bin_angles[tries+1], dy=dy+1, min_thresh=min_thresh, tries=tries+1)
                 bins['bin_x{}to{}_y{}to{}'.format(max_x, max_x+dx, max_y, max_y+dy)] = binned_df
             max_y+=dy
         max_x+=dx
@@ -82,7 +78,7 @@ def plot_boxplot(df, base_path, fname):
 def plot_corr(df, base_path, fname):
     """Plot the correlations with boat speed"""
     corrs = {}
-    for col in df.drop(['date TU', 'heure TU', 'latitude', 'longitude'], axis=1).columns:
+    for col in df.drop(wind_features, axis=1).columns:
         if col != boat_speed_feature:
             corr = df[boat_speed_feature].corr(df[col])
             if not math.isnan(corr):
@@ -113,24 +109,22 @@ df = transform_columns(df,
                     '1s_Foil_B_S_01_i', '1s_Foil_B_S_01_o',
                     '1s_Foil_ELE_C_01_p', '1s_Foil_ELE_C_01_s',
                     '1s_Foil_ELE_LOAD_P', '1s_Foil_ELE_LOAD_S'],
+                    wind_features + [boat_speed_feature],
                     '.*{}.*')
-
-# Compute absolute values of the angles.
-abs_angles(df)
 
 # Create different-sized bins.
 bin_sizes = [10, 50, 100]
 for min_thresh in bin_sizes:
     # Determine the size of the bins.
-    bins, dx, dy, max_x, max_y = create_bins(df, min_thresh=min_thresh)
+    bins, dx, dy, _, max_y = create_bins(df, min_thresh=min_thresh)
 
     # Plot and save the bins.
     base_path = './report/min_thresh_{}'.format(min_thresh)
-    plot_wind_angle_speed(df, 0, 0, max_x+1, max_y+1, dx, dy, 0.25, base_path, 'bins')
+    plot_wind_angle_speed(df, -180, 0, 180+1, max_y+1, dx, dy, 0.25, base_path, 'bins')
     base_path = '{}/bins'.format(base_path)
     for bin_name, binned_df in bins.items():
         bin_base_path = '{}/{}'.format(base_path, bin_name)
-        x_start, x_finish, y_start, y_finish = [int(s) for s in re.findall(r'\d+', bin_name)]
+        x_start, x_finish, y_start, y_finish = [int(s) for s in re.findall(r'[+-]?\d+', bin_name)]
         dx, dy = (x_finish-x_start)/4.0, (y_finish-y_start)/4.0
         plot_wind_angle_speed(binned_df, x_start, y_start, x_finish+dx, y_finish+dy, dx, dy, 3, bin_base_path, 'bin')
         plot_boxplot(binned_df, bin_base_path, 'boxplot')
