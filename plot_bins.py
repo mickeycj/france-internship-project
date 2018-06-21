@@ -16,6 +16,10 @@ boat_speed_feature = 'WTP_SelBoatSpd'
 bins_axis_names = ['Wind Angle (˚)', 'Wind Speed (knot)']
 boxplot_axis_name = 'Boat Speed (knot)'
 
+# Regular Expressions.
+feature_regex = r'.*{}.*'
+bin_dimension_regex = r'[+-]?\d+'
+
 def read_csv(fname):
     """Read a CSV file to a Pandas Dataframe"""
     return pd.read_csv(fname, sep=';')
@@ -110,7 +114,7 @@ df = transform_columns(df,
                     '1s_Foil_ELE_C_01_p', '1s_Foil_ELE_C_01_s',
                     '1s_Foil_ELE_LOAD_P', '1s_Foil_ELE_LOAD_S'],
                     wind_features + [boat_speed_feature],
-                    '.*{}.*')
+                    feature_regex)
 
 # Create different-sized bins.
 bin_sizes = [10, 50, 100]
@@ -124,7 +128,7 @@ for min_thresh in bin_sizes:
     base_path = '{}/bins'.format(base_path)
     for bin_name, binned_df in bins.items():
         bin_base_path = '{}/{}'.format(base_path, bin_name)
-        x_start, x_finish, y_start, y_finish = [int(s) for s in re.findall(r'[+-]?\d+', bin_name)]
+        x_start, x_finish, y_start, y_finish = [int(s) for s in re.findall(bin_dimension_regex, bin_name)]
         dx, dy = (x_finish-x_start)/4.0, (y_finish-y_start)/4.0
         plot_wind_angle_speed(binned_df, x_start, y_start, x_finish+dx, y_finish+dy, dx, dy, 3, bin_base_path, 'bin')
         plot_boxplot(binned_df, bin_base_path, 'boxplot')
