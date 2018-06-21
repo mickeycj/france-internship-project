@@ -39,11 +39,6 @@ def transform_columns(df, new_cols, additional_cols, regex):
             transformed_df[col] = df[col]
     return transformed_df
 
-def create_if_not_exist(path):
-    """Create a directory if not exist"""
-    if not os.path.exists(path):
-        os.makedirs(path)
-
 def create_bins(df, dx=bin_angles[0], dy=1, min_thresh=10, tries=0):
     """Create bins"""
     bins = {}
@@ -59,6 +54,11 @@ def create_bins(df, dx=bin_angles[0], dy=1, min_thresh=10, tries=0):
             max_y+=dy
         max_x+=dx
     return bins, dx, dy, max_x, max_y
+
+def create_if_not_exist(path):
+    """Create a directory if not exist"""
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 def plot_wind_angle_speed(df, x_start, y_start, x_finish, y_finish, dx, dy, markersize, base_path, fname):
     """Plot the wind angle-speed space"""
