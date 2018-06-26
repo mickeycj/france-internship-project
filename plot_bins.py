@@ -26,7 +26,7 @@ bin_dimensions_regex = r'[+-]?\d+'
 
 def read_csv(fnames):
     """Read CSV file(s) to a Pandas Dataframe"""
-    return pd.concat(map(lambda fname: pd.read_csv(fname, sep=';'), fnames))
+    return pd.concat(map(lambda fname: pd.read_csv(fname, sep=';', encoding='ISO-8859-1'), fnames))
 
 def transform_columns(df, new_cols, additional_cols, regex):
     """Transform the dataset"""
