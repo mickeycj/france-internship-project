@@ -146,13 +146,13 @@ for min_thresh in bin_sizes:
     bins, dx, dy, _, max_y = create_bins(df, min_thresh=min_thresh)
 
     # Plot and save the bins.
-    base_path = './reports/{}/min_thresh_{}'.format(version, min_thresh)
-    plot_wind_angle_speed(df, -180, 0, 180+1, max_y+1, dx, dy, 0.25, base_path, 'bins')
-    base_path = '{}/bins'.format(base_path)
+    reports_path = '{}/min_thresh_{}'.format(reports_path, min_thresh)
+    plot_wind_angle_speed(df, -180, 0, 180+1, max_y+1, dx, dy, 0.25, reports_path, 'bins')
+    reports_path = '{}/bins'.format(reports_path)
     for bin_name, binned_df in bins.items():
-        bin_base_path = '{}/{}'.format(base_path, bin_name)
+        bin_reports_path = '{}/{}'.format(reports_path, bin_name)
         x_start, x_finish, y_start, y_finish = [int(s) for s in re.findall(bin_dimensions_regex, bin_name)]
         dx, dy = (x_finish-x_start)/4.0, (y_finish-y_start)/4.0
-        plot_wind_angle_speed(binned_df, x_start, y_start, x_finish+dx, y_finish+dy, dx, dy, 3, bin_base_path, 'bin')
-        plot_boxplot(binned_df, bin_base_path, 'boxplot')
-        plot_corr(binned_df, bin_base_path, 'corr')
+        plot_wind_angle_speed(binned_df, x_start, y_start, x_finish+dx, y_finish+dy, dx, dy, 3, bin_reports_path, 'bin')
+        plot_boxplot(binned_df, bin_reports_path, 'boxplot')
+        plot_corr(binned_df, bin_reports_path, 'corr')
