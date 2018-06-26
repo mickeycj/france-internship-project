@@ -13,6 +13,10 @@ import seaborn as sns
 version = sys.argv[1]
 fnames = sys.argv[2:]
 
+# File paths.
+data_path = './data/{}'.format(version)
+reports_path = './reports/{}'.format(version)
+
 # Ignore PyPlot warning.
 plt.rcParams.update({'figure.max_open_warning': 0})
 
@@ -119,7 +123,7 @@ def plot_corr(df, base_path, fname):
     plt.clf()
 
 # Read from CSV file(s).
-df = read_csv(map(lambda arg: '{}.csv'.format(arg), fnames))
+df = read_csv(map(lambda arg: '{}/{}.csv'.format(data_path, arg), fnames))
 
 # Transform the dataset to decrease the number of features.
 df = transform_columns(df,
