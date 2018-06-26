@@ -13,9 +13,8 @@ import seaborn as sns
 version = sys.argv[1]
 fnames = sys.argv[2:]
 
-# File paths.
+# Data path.
 data_path = './data/{}'.format(version)
-reports_path = './reports/{}'.format(version)
 
 # Ignore PyPlot warning.
 plt.rcParams.update({'figure.max_open_warning': 0})
@@ -146,7 +145,7 @@ for min_thresh in bin_sizes:
     bins, dx, dy, _, max_y = create_bins(df, min_thresh=min_thresh)
 
     # Plot and save the bins.
-    reports_path = '{}/min_thresh_{}'.format(reports_path, min_thresh)
+    reports_path = './reports/{}/min_thresh_{}'.format(version, min_thresh)
     plot_wind_angle_speed(df, -180, 0, 180+1, max_y+1, dx, dy, 0.25, reports_path, 'bins')
     reports_path = '{}/bins'.format(reports_path)
     for bin_name, binned_df in bins.items():
