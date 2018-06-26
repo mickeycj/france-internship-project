@@ -36,7 +36,7 @@ else:
 bins_axis_names = ['Wind Angle (˚)', 'Wind Speed (knot)']
 boxplot_axis_name = 'Boat Speed (knot)'
 
-# Regular Expressions.
+# Regular expressions.
 feature_regex = r'.*{}.*'
 bin_dimensions_regex = r'[+-]?\d+'
 
