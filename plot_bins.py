@@ -24,9 +24,9 @@ boxplot_axis_name = 'Boat Speed (knot)'
 feature_regex = r'.*{}.*'
 bin_dimensions_regex = r'[+-]?\d+'
 
-def read_csv(fname):
-    """Read a CSV file to a Pandas Dataframe"""
-    return pd.read_csv(fname, sep=';')
+def read_csv(fnames):
+    """Read CSV file(s) to a Pandas Dataframe"""
+    return pd.concat(map(lambda fname: pd.read_csv(fname, sep=';'), fnames))
 
 def transform_columns(df, new_cols, additional_cols, regex):
     """Transform the dataset"""
@@ -103,8 +103,8 @@ def plot_corr(df, base_path, fname):
     plt.savefig('{}/{}.pdf'.format(base_path, fname))
     plt.clf()
 
-# Read from CSV.
-df = read_csv('{}.csv'.format(sys.argv[1]))
+# Read from CSV file(s).
+df = read_csv(map(lambda arg: '{}.csv'.format(arg), sys.argv[1:]))
 
 # Transform the dataset to decrease the number of features.
 df = transform_columns(df,
