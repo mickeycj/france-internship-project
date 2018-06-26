@@ -45,7 +45,7 @@ def create_bins(df, dx=bin_angles[0], dy=1, min_thresh=10, tries=0):
     max_x = -180
     while max_x < 180:
         max_y = 0
-        while max_y < math.ceil(df.loc[df[wind_features[1]].idxmax()][wind_features[1]]):
+        while max_y < math.ceil(df[wind_features[1]].max()):
             binned_df = df.query('{0} >= {2} and {0} < {2}+{4} & {1} >= {3} & {1} < {3}+{5}'.format(wind_features[0], wind_features[1], max_x, max_y, dx, dy))
             if len(binned_df) >= int(math.ceil(min_thresh * 0.1)):
                 if len(binned_df) < min_thresh:
