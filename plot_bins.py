@@ -3,10 +3,15 @@ import os
 import re
 import sys
 
+import chardet
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+
+# Command line arguments.
+version = sys.argv[1]
+fnames = sys.argv[2:]
 
 # Ignore PyPlot warning.
 plt.rcParams.update({'figure.max_open_warning': 0})
@@ -15,8 +20,15 @@ plt.rcParams.update({'figure.max_open_warning': 0})
 bin_angles = [5, 6, 8, 9, 10, 12, 15, 18, 20, 24, 30, 36, 40, 45, 60, 72]
 
 # List of relevant features and axis names.
-wind_features = ['WTP_AW_angle', 'WTP_AW_speed']
-boat_speed_feature = 'WTP_SelBoatSpd'
+if version =='v1':
+    wind_features = ['WTP_AW_angle', 'WTP_AW_speed']
+    boat_speed_feature = 'WTP_SelBoatSpd'
+elif version =='v2':
+    wind_features = ['VarFilter_WTP_AW_angle', 'VarFilter_WTP_AW_speed']
+    boat_speed_feature = 'VarFilter_WTP_SelBoatSpd'
+else:
+    print('This version number does not exist!')
+    exit()
 bins_axis_names = ['Wind Angle (˚)', 'Wind Speed (knot)']
 boxplot_axis_name = 'Boat Speed (knot)'
 
@@ -26,7 +38,10 @@ bin_dimensions_regex = r'[+-]?\d+'
 
 def read_csv(fnames):
     """Read CSV file(s) to a Pandas Dataframe"""
-    return pd.concat(map(lambda fname: pd.read_csv(fname, sep=';', encoding='ISO-8859-1'), fnames))
+    def detect_and_read(fname):
+        with open(fname, 'rb') as f:
+            return pd.read_csv(fname, sep=';', encoding=chardet.detect(f.read())['encoding'])
+    return pd.concat(map(lambda fname: detect_and_read(fname), fnames), sort=False)
 
 def transform_columns(df, new_cols, additional_cols, regex):
     """Transform the dataset"""
@@ -34,9 +49,9 @@ def transform_columns(df, new_cols, additional_cols, regex):
     for col in new_cols + additional_cols:
         if col not in additional_cols:
             filtered = df.filter(regex=(regex.format(col)))
-            transformed_df[col] = filtered.mean(axis=1)
+            transformed_df[col] = pd.to_numeric(filtered.mean(axis=1))
         else:
-            transformed_df[col] = df[col]
+            transformed_df[col] = pd.to_numeric(df[col])
     return transformed_df
 
 def create_bins(df, dx=bin_angles[0], dy=1, min_thresh=10, tries=0):
@@ -104,7 +119,7 @@ def plot_corr(df, base_path, fname):
     plt.clf()
 
 # Read from CSV file(s).
-df = read_csv(map(lambda arg: '{}.csv'.format(arg), sys.argv[1:]))
+df = read_csv(map(lambda arg: '{}.csv'.format(arg), fnames))
 
 # Transform the dataset to decrease the number of features.
 df = transform_columns(df,
@@ -127,7 +142,7 @@ for min_thresh in bin_sizes:
     bins, dx, dy, _, max_y = create_bins(df, min_thresh=min_thresh)
 
     # Plot and save the bins.
-    base_path = './report/min_thresh_{}'.format(min_thresh)
+    base_path = './reports/{}/min_thresh_{}'.format(version, min_thresh)
     plot_wind_angle_speed(df, -180, 0, 180+1, max_y+1, dx, dy, 0.25, base_path, 'bins')
     base_path = '{}/bins'.format(base_path)
     for bin_name, binned_df in bins.items():
