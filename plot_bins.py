@@ -51,10 +51,9 @@ def transform_columns(df, new_cols, additional_cols, regex):
     transformed_df = pd.DataFrame()
     for col in new_cols + additional_cols:
         if col not in additional_cols:
-            filtered = df.filter(regex=(regex.format(col)))
-            transformed_df[col] = pd.to_numeric(filtered.mean(axis=1))
+            transformed_df[col] = df.filter(regex=(regex.format(col))).mean(axis=1)
         else:
-            transformed_df[col] = pd.to_numeric(df[col])
+            transformed_df[col] = df[col]
     return transformed_df
 
 def create_bins(df, dx=bin_angles[0], dy=1, min_thresh=10, tries=0):
