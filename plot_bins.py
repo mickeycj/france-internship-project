@@ -9,15 +9,15 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
+# Ignore PyPlot warning.
+plt.rcParams.update({'figure.max_open_warning': 0})
+
 # Command line arguments.
 version = sys.argv[1]
 fnames = sys.argv[2:]
 
 # Data path.
 data_path = './data/{}'.format(version)
-
-# Ignore PyPlot warning.
-plt.rcParams.update({'figure.max_open_warning': 0})
 
 # Possible bin angles.
 bin_angles = [5, 6, 8, 9, 10, 12, 15, 18, 20, 24, 30, 36, 40, 45, 60, 72]
