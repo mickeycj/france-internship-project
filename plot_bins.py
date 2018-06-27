@@ -41,23 +41,34 @@ bin_dimensions_regex = r'[+-]?\d+'
 
 def read_csv(fnames):
     """Read CSV file(s) to a Pandas Dataframe"""
+    print('Creating dataframe...')
     def detect_and_read(fname):
         with open(fname, 'rb') as f:
-            return pd.read_csv(fname, sep=';', encoding=chardet.detect(f.read())['encoding'])
-    return pd.concat(map(lambda fname: detect_and_read(fname), fnames), sort=False)
+            encoding = chardet.detect(f.read())['encoding']
+            print('File {}\'s encoding: {}'.format(fname, encoding))
+            return pd.read_csv(fname, sep=';', encoding=encoding)
+    df = pd.concat(map(lambda fname: detect_and_read(fname), fnames), sort=False)
+    print('Dataframe created!')
+    return df
 
 def transform_columns(df, new_cols, additional_cols, regex):
     """Transform the dataset"""
+    print('Transforming columns...')
     transformed_df = pd.DataFrame()
     for col in new_cols + additional_cols:
         if col not in additional_cols:
             transformed_df[col] = df.filter(regex=(regex.format(col))).mean(axis=1)
         else:
             transformed_df[col] = df[col]
+    print('Columns transformed!')
     return transformed_df
 
 def create_bins(df, dx=bin_angles[0], dy=1, min_thresh=10, tries=0):
     """Create bins"""
+    if tries == 0:
+        print('Creating bins...')
+    else:
+        print('Bin\'s size adjusted. Tries: {}'.format(tries))
     bins = {}
     max_x = -180
     while max_x < 180:
@@ -70,15 +81,19 @@ def create_bins(df, dx=bin_angles[0], dy=1, min_thresh=10, tries=0):
                 bins['bin_x{}to{}_y{}to{}'.format(max_x, max_x+dx, max_y, max_y+dy)] = binned_df
             max_y+=dy
         max_x+=dx
+    print('Bins created after {} tries!'.format(tries+1))
     return bins, dx, dy, max_x, max_y
 
 def create_if_not_exist(path):
     """Create a directory if not exist"""
     if not os.path.exists(path):
         os.makedirs(path)
+        print('Directory {} created!'.format(path))
 
 def plot_wind_angle_speed(df, x_start, y_start, x_finish, y_finish, dx, dy, markersize, base_path, fname):
     """Plot the wind angle-speed space"""
+    path = '{}/{}.pdf'.format(base_path, fname)
+    print('Saving plot to {}'.format(path))
     plt.xlabel(bins_axis_names[0])
     plt.ylabel(bins_axis_names[1])
     plt.plot(df[wind_features[0]].tolist(), df[wind_features[1]].tolist(), 'ko', markersize=markersize)
@@ -87,21 +102,25 @@ def plot_wind_angle_speed(df, x_start, y_start, x_finish, y_finish, dx, dy, mark
     plt.grid(lw=.75)
     plt.tight_layout()
     create_if_not_exist(base_path)
-    plt.savefig('{}/{}.pdf'.format(base_path, fname))
+    plt.savefig(path)
     plt.clf()
 
 def plot_boxplot(df, base_path, fname):
     """Plot the boxplot for boat speed"""
+    path = '{}/{}.pdf'.format(base_path, fname)
+    print('Saving plot to {}'.format(path))
     df.boxplot(column=boat_speed_feature, showfliers=df[boat_speed_feature].median() == df[boat_speed_feature].mode().iloc[0])
     plt.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
     plt.ylabel(boxplot_axis_name)
     plt.tight_layout()
     create_if_not_exist(base_path)
-    plt.savefig('{}/{}.pdf'.format(base_path, fname))
+    plt.savefig(path)
     plt.clf()
 
 def plot_corr(df, base_path, fname):
     """Plot the correlations with boat speed"""
+    path = '{}/{}.pdf'.format(base_path, fname)
+    print('Saving plot to {}'.format(path))
     corrs = {}
     for col in df.drop(wind_features, axis=1).columns:
         if col != boat_speed_feature:
@@ -117,12 +136,13 @@ def plot_corr(df, base_path, fname):
     plt.yticks(fontsize=5)
     plt.tight_layout()
     create_if_not_exist(base_path)
-    plt.savefig('{}/{}.pdf'.format(base_path, fname))
+    plt.savefig(path)
     plt.clf()
 
 # Read from CSV file(s).
 df = read_csv(map(lambda arg: '{}/{}.csv'.format(data_path, arg), fnames))
 
+print('------------------------------------------')
 # Transform the dataset to decrease the number of features.
 df = transform_columns(df,
                     ['1s_FBM_P_lfwd', '1s_FBM_P_uaft', '1s_FBM_P_ufwd',
@@ -140,10 +160,13 @@ df = transform_columns(df,
 # Create different-sized bins.
 bin_sizes = [10, 50, 100]
 for min_thresh in bin_sizes:
+    print('------------------------------------------')
     # Determine the size of the bins.
+    print('Creating bins with minimum size of {}.'.format(min_thresh))
     bins, dx, dy, _, max_y = create_bins(df, min_thresh=min_thresh)
 
     # Plot and save the bins.
+    print('Creating plots...')
     reports_path = './reports/{}/min_thresh_{}'.format(version, min_thresh)
     plot_wind_angle_speed(df, -180, 0, 180+1, max_y+1, dx, dy, 0.25, reports_path, 'bins')
     reports_path = '{}/bins'.format(reports_path)
@@ -154,3 +177,6 @@ for min_thresh in bin_sizes:
         plot_wind_angle_speed(binned_df, x_start, y_start, x_finish+dx, y_finish+dy, dx, dy, 3, bin_reports_path, 'bin')
         plot_boxplot(binned_df, bin_reports_path, 'boxplot')
         plot_corr(binned_df, bin_reports_path, 'corr')
+    print('All plots saved!')
+print('------------------------------------------')
+print('Bins creation finished!')
