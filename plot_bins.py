@@ -32,8 +32,8 @@ elif version =='v2':
 else:
     print('This version number does not exist!')
     exit()
-bins_axis_names = ['Wind Angle (˚)', 'Wind Speed (knot)']
-boxplot_axis_name = 'Boat Speed (knot)'
+bins_axis_names = ['Wind Angle (˚)', 'Wind Speed (knots)']
+boxplot_axis_name = 'Boat Speed (knots)'
 
 # Regular expressions.
 feature_regex = r'.*{}.*'
