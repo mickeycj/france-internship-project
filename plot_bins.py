@@ -121,7 +121,7 @@ def plot_boxplot(df, base_path, fname):
     plt.savefig(path)
     plt.clf()
 
-def plot_corr(df, base_path, fname):
+def plot_corr(df, num_features, base_path, fname):
     """Plot the correlations with boat speed"""
     path = '{}/{}.pdf'.format(base_path, fname)
     print('Saving plot to {}'.format(path))
@@ -131,7 +131,7 @@ def plot_corr(df, base_path, fname):
             corr = df[boat_speed_feature].corr(df[col])
             if not math.isnan(corr):
                 corrs[col] = corr
-    sorted_corrs = sorted(corrs.items(), key=lambda x: abs(x[1]), reverse=True)[:20]
+    sorted_corrs = sorted(corrs.items(), key=lambda x: abs(x[1]), reverse=True)[:num_features]
     sorted_corrs = sorted(sorted_corrs, key=lambda x: x[1], reverse=True)
     cols = [boat_speed_feature] + [i[0] for i in sorted_corrs]
     corr = df[cols].corr()
@@ -180,7 +180,7 @@ for min_thresh in bin_sizes:
         dx, dy = (x_finish-x_start)/4.0, (y_finish-y_start)/4.0
         plot_wind_angle_speed(binned_df, x_start, y_start, x_finish+dx, y_finish+dy, dx, dy, 3, bin_reports_path, 'bin')
         plot_boxplot(binned_df, bin_reports_path, 'boxplot')
-        plot_corr(binned_df, bin_reports_path, 'corr')
+        plot_corr(binned_df, 20, bin_reports_path, 'corr')
     print('All plots saved!')
 print('------------------------------------------')
 print('Bins creation finished!')
