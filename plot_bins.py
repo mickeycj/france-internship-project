@@ -143,6 +143,8 @@ def plot_corr(df, num_features, base_path, fname):
     plt.savefig(path)
     plt.clf()
 
+print('Initializing bins creation...')
+print('------------------------------------------')
 # Read from CSV file(s).
 df = read_csv(map(lambda arg: '{}/{}.csv'.format(data_path, arg), fnames))
 
