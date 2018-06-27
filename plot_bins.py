@@ -81,7 +81,11 @@ def create_bins(df, dx=bin_angles[0], dy=1, min_thresh=10, tries=0):
                 bins['bin_x{}to{}_y{}to{}'.format(max_x, max_x+dx, max_y, max_y+dy)] = binned_df
             max_y+=dy
         max_x+=dx
-    print('Bins created after {} tries!'.format(tries+1))
+    if tries == 0:
+        tries_str = '1 try'
+    else:
+        tries_str = '{} tries'.format(tries+1)
+    print('Bins created after {}!'.format(tries_str))
     return bins, dx, dy, max_x, max_y
 
 def create_if_not_exist(path):
