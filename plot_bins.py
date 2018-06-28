@@ -25,7 +25,7 @@ bin_angles = [5, 6, 8, 9, 10, 12, 15, 18, 20, 24, 30, 36, 40, 45, 60, 72]
 # List of relevant features and axis names.
 identifier_features = [
     ('Date', 'Date'),
-    ('Hour', 'Timestamp'),
+    ('Hour', 'Hour'),
     ('VarFilter_WTP_GPS1_lat', 'Latitude'),
     ('VarFilter_WTP_GPS1_long', 'Longitude')
 ]
@@ -83,7 +83,7 @@ fiber_optics_appendix_features = [
     ('1s_Foil_RUD_C_1_e_0_P', 'Rudder - Port (Center)'),
     ('1s_Foil_RUD_C_1_e_0_S', 'Rudder - Starboard (Center)')
 ]
-inertial_features = [
+other_sensor_features = [
     ('IxBlue_Heading', 'IxB - Heading'),
     ('IxBlue_Heave', 'IxB - Heave'),
     ('IxBlue_HeaveAccel', 'IxB - Heave Accel.'),
@@ -93,9 +93,7 @@ inertial_features = [
     ('IxBlue_RollRate', 'IxB - Roll Rate'),
     ('IxBlue_SurgeAccel', 'IxB - Surge Accel.'),
     ('IxBlue_SwayAccel', 'IxB - Sway Accel.'),
-    ('IxBlue_YawRate', 'IxB - Yaw Rate')
-]
-other_sensor_features = [
+    ('IxBlue_YawRate', 'IxB - Yaw Rate'),
     ('RM_RM', 'Righting Moment'),
     ('VarFilter_sirius_b2_ 1', 'Mainsail 2'),
     ('VarFilter_sirius_b2_ 2', 'Mainsail 1'),
@@ -104,31 +102,17 @@ other_sensor_features = [
     ('VarFilter_WTP_Forestay_0_Load', 'Forestay Load (J0)'),
     ('VarFilter_WTP_Forestay_1_Load', 'Forestay Load (J1)'),
     ('VarFilter_WTP_Forestay_2_Load', 'Forestay Load (J2)'),
-    ('VarFilter_WTP_Forestay_3_Load', 'Forestay Load (J3)'),
     ('VarFilter_WTP_MastRot', 'Mast Rotation Angle'),
     ('VarFilter_WTP_CBoard_Elevator_angle', 'Board - Elevator Angle (Center)'),
-    ('VarFilter_WTP_CBoard_Trimmer_angle', 'Board - Trimmer Angle (Center)'),
+    ('VarFilter_WTP_CBoard_Trimmer_angle_norm', 'Board - Trimmer Angle (Center)'),
     ('VarFilter_WTP_Cboard_Extension', 'Board - Extension (Center)'),
     ('VarFilter_WTP_Cboard_Load', 'Board - Load (Center)'),
-    ('VarFilter_WTP_Cboard_Load_Dwn', 'Board - Down Load (Center)'),
-    ('VarFilter_WTP_Cboard_Load_Up', 'Board - Up Load (Center)'),
     ('VarFilter_WTP_Foil_Prt_Extension', 'Board - Extension (Port)'),
-    ('VarFilter_WTP_Foil_Prt_Load', 'Board - Load (Port)'),
-    ('VarFilter_WTP_Foil_Prt_Load_Dwn', 'Board - Down Load (Port)'),
-    ('VarFilter_WTP_Foil_Prt_Load_Up', 'Board - Up Load (Port)'),
     ('VarFilter_WTP_Foil_Prt_Rake', 'Board - Rake (Port)'),
-    ('VarFilter_WTP_Foil_Prt_Rake_pressure', 'Board - Rake Pressure (Port)'),
     ('VarFilter_WTP_Foil_Stb_Extension', 'Board - Extension (Starboard)'),
-    ('VarFilter_WTP_Foil_Stb_Load', 'Board - Load (Starboard)'),
-    ('VarFilter_WTP_Foil_Stb_Load_Dwn', 'Board - Down Load (Starboard)'),
-    ('VarFilter_WTP_Foil_Stb_Load_Up', 'Board - Up Load (Starboard)'),
     ('VarFilter_WTP_Foil_Stb_Rake', 'Board - Rake (Starboard)'),
-    ('VarFilter_WTP_Foil_Stb_Rake_pressure', 'Board - Rake Pressure (Starboard)'),
     ('VarFilter_WTP_Rudder_Angle_CC', 'Rudder - Angle (Center)'),
     ('VarFilter_WTP_Rudder_CC_Elevator_angle', 'Rudder - Elevator Angle (Center)'),
-    ('VarFilter_WTP_Rudder_CC_Load', 'Rudder - Load (Center)'),
-    ('VarFilter_WTP_Rudder_CC_Load_Prt', 'Rudder - Port Load (Center)'),
-    ('VarFilter_WTP_Rudder_CC_Load_Stb', 'Rudder - Starboard Load (Center)'),
     ('VarFilter_WTP_Rudder_Angle_Prt', 'Rudder - Angle (Port)'),
     ('VarFilter_WTP_Rudder_Prt_Elevator_angle', 'Rudder - Elevator Angle (Port)'),
     ('VarFilter_WTP_Rudder_Prt_Load_I', 'Rudder - Inside Load (Port)'),
@@ -142,19 +126,10 @@ other_sensor_features = [
 ]
 wind_features = [
     ('VarFilter_WTP_TW_angle', 'Wind Angle'),
-    ('VarFilter_WTP_TW_speed', 'Wind Speed'),
-    ('VarFilter_WTP_AW_angle', 'Apparant Wind Angle'),
-    ('VarFilter_WTP_AW_speed', 'Apparant Wind Speed'),
-    ('VarFilter_WTP_MW_angle', 'Measured Wind Angle'),
-    ('VarFilter_WTP_MW_speed', 'Measured Wind Speed')
+    ('VarFilter_WTP_TW_speed', 'Wind Speed')
 ]
 target_features = [
-    ('VarFilter_WTP_SelBoatSpd', 'Boat Speed'),
-    ('VarFilter_WTP_SelSOG', 'Speed Over Ground'),
-    ('VarFilter_WTP_SelCOG', 'Course Over Ground'),
-    ('VarFilter_WTP_SelHdg', 'Heading'),
-    ('VarFilter_WTP_SelHeel', 'Heel'),
-    ('VarFilter_WTP_SelTrim', 'Trim')
+    ('VarFilter_WTP_SelBoatSpd', 'Boat Speed')
 ]
 old_wind_features = ['VarFilter_WTP_AW_angle', 'VarFilter_WTP_AW_speed']
 boat_speed_feature = 'VarFilter_WTP_SelBoatSpd'
@@ -177,15 +152,15 @@ def read_csv(fnames):
     print('Dataframe created!')
     return df
 
-def transform_columns(df, new_cols, additional_cols, regex):
+def transform_columns(df, identifier_cols, cols_to_transform, other_cols, regex):
     """Transform the dataset"""
     print('Transforming columns...')
     transformed_df = pd.DataFrame()
-    for col in new_cols + additional_cols:
-        if col not in additional_cols:
-            transformed_df[col] = df.filter(regex=(regex.format(col))).mean(axis=1)
+    for old_col, new_col in identifier_cols + cols_to_transform + other_cols:
+        if (old_col, new_col) not in identifier_cols + other_cols:
+            transformed_df[new_col] = df.filter(regex=(regex.format(old_col))).mean(axis=1)
         else:
-            transformed_df[col] = df[col]
+            transformed_df[new_col] = df[old_col]
     print('Columns transformed!')
     return transformed_df
 
@@ -277,38 +252,32 @@ df = read_csv(map(lambda arg: '{}/{}.csv'.format(data_path, arg), fnames))
 print('------------------------------------------')
 # Transform the dataset to decrease the number of features.
 df = transform_columns(df,
-                    ['1s_FBM_P_lfwd', '1s_FBM_P_uaft', '1s_FBM_P_ufwd',
-                    '1s_FBM_S_laft', '1s_FBM_S_lfwd', '1s_FBM_S_uaft', '1s_FBM_S_ufwd',
-                    '1s_HUL_C_lport', '1s_HUL_C_lstbd', '1s_HUL_C_uport', '1s_HUL_C_ustbd',
-                    '1s_HUL_P_lport', '1s_HUL_P_lstbd', '1s_HUL_P_uport', '1s_HUL_P_ustbd',
-                    '1s_HUL_S_lport', '1s_HUL_S_lstbd', '1s_HUL_S_uport', '1s_HUL_S_ustbd',
-                    '1s_Foil_B_P_01_i', '1s_Foil_B_P_01_o',
-                    '1s_Foil_B_S_01_i', '1s_Foil_B_S_01_o',
-                    '1s_Foil_ELE_C_01_p', '1s_Foil_ELE_C_01_s',
-                    '1s_Foil_ELE_LOAD_P', '1s_Foil_ELE_LOAD_S'],
-                    old_wind_features + [boat_speed_feature],
+                    identifier_features,
+                    fiber_optics_structure_features + fiber_optics_appendix_features,
+                    other_sensor_features + wind_features + target_features,
                     feature_regex)
+print(df.columns)
 
 # Create different-sized bins.
-bin_sizes = [10, 50, 100]
-for min_thresh in bin_sizes:
-    print('------------------------------------------')
-    # Determine the size of the bins.
-    print('Creating bins with minimum size of {}.'.format(min_thresh))
-    bins, dx, dy, _, max_y = create_bins(df, min_thresh=min_thresh)
+# bin_sizes = [10, 50, 100]
+# for min_thresh in bin_sizes:
+#     print('------------------------------------------')
+#     # Determine the size of the bins.
+#     print('Creating bins with minimum size of {}.'.format(min_thresh))
+#     bins, dx, dy, _, max_y = create_bins(df, min_thresh=min_thresh)
 
-    # Plot and save the bins.
-    print('Creating plots...')
-    reports_path = './reports/{}/min_thresh_{}'.format(version, min_thresh)
-    plot_wind_angle_speed(df, -180, 0, 180+1, max_y+1, dx, dy, 0.25, reports_path, 'bins')
-    reports_path = '{}/bins'.format(reports_path)
-    for bin_name, binned_df in bins.items():
-        bin_reports_path = '{}/{}'.format(reports_path, bin_name)
-        x_start, x_finish, y_start, y_finish = [int(s) for s in re.findall(bin_dimensions_regex, bin_name)]
-        dx, dy = (x_finish-x_start)/4.0, (y_finish-y_start)/4.0
-        plot_wind_angle_speed(binned_df, x_start, y_start, x_finish+dx, y_finish+dy, dx, dy, 3, bin_reports_path, 'bin')
-        plot_boxplot(binned_df, bin_reports_path, 'boxplot')
-        plot_corr(binned_df, 20, bin_reports_path, 'corr')
-    print('All plots saved!')
-print('------------------------------------------')
-print('Bins creation finished!')
+#     # Plot and save the bins.
+#     print('Creating plots...')
+#     reports_path = './reports/{}/min_thresh_{}'.format(version, min_thresh)
+#     plot_wind_angle_speed(df, -180, 0, 180+1, max_y+1, dx, dy, 0.25, reports_path, 'bins')
+#     reports_path = '{}/bins'.format(reports_path)
+#     for bin_name, binned_df in bins.items():
+#         bin_reports_path = '{}/{}'.format(reports_path, bin_name)
+#         x_start, x_finish, y_start, y_finish = [int(s) for s in re.findall(bin_dimensions_regex, bin_name)]
+#         dx, dy = (x_finish-x_start)/4.0, (y_finish-y_start)/4.0
+#         plot_wind_angle_speed(binned_df, x_start, y_start, x_finish+dx, y_finish+dy, dx, dy, 3, bin_reports_path, 'bin')
+#         plot_boxplot(binned_df, bin_reports_path, 'boxplot')
+#         plot_corr(binned_df, 20, bin_reports_path, 'corr')
+#     print('All plots saved!')
+# print('------------------------------------------')
+# print('Bins creation finished!')
