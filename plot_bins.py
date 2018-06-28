@@ -35,29 +35,26 @@ def transform_columns(df, identifier_cols, cols_to_transform, other_cols, regex)
     print('Columns transformed!')
     return transformed_df
 
-def create_bins(df, wind_features, dx=bin_angles[0], dy=1, min_thresh=10, tries=0):
+def create_bins(df, wind_features, dx=5, dy=2, min_thresh=5):
     """Create bins"""
-    if tries == 0:
-        print('Creating bins...')
-    else:
-        print('Bin\'s size adjusted. Tries: {}'.format(tries))
     bins = {}
+    num_bins = 0
     max_x = -180
     while max_x < 180:
         max_y = 0
         while max_y < math.ceil(df[wind_features[1]].max()):
             binned_df = df.query('{0} >= {2} and {0} < {2}+{4} & {1} >= {3} & {1} < {3}+{5}'.format(wind_features[0], wind_features[1], max_x, max_y, dx, dy))
-            if len(binned_df) >= int(math.ceil(min_thresh*0.1)):
-                if len(binned_df) < min_thresh:
-                    return create_bins(df, wind_features, dx=bin_angles[tries+1], dy=dy+1, min_thresh=min_thresh, tries=tries+1)
-                bins['bin_x{}to{}_y{}to{}'.format(max_x, max_x+dx, max_y, max_y+dy)] = binned_df
+            bin_size = len(binned_df)
+            if bin_size >= min_thresh:
+                bin_name = 'bin_x{}to{}_y{}to{}'.format(max_x, max_x+dx, max_y, max_y+dy)
+                print('Creating {}...'.format(bin_name))
+                print('Bin size: {}'.format(bin_size))
+                bins[bin_name] = binned_df
+                num_bins+=1
             max_y+=dy
         max_x+=dx
-    if tries == 0:
-        tries_str = '1 try'
-    else:
-        tries_str = '{} tries'.format(tries+1)
-    print('Bins created after {}!'.format(tries_str))
+    bins['num_bins'] = num_bins
+    print('{} bins created!'.format(num_bins))
     return bins, dx, dy, max_x, max_y
 
 def create_if_not_exist(path):
@@ -142,26 +139,25 @@ df = transform_columns(df,
                     other_sensor_features + wind_features + [boat_speed_feature],
                     feature_regex)
 
-# Create different-sized bins.
-bin_sizes = [10, 50, 100]
-for min_thresh in bin_sizes:
-    print('------------------------------------------')
-    # Determine the size of the bins.
-    print('Creating bins with minimum size of {}.'.format(min_thresh))
-    bins, dx, dy, _, max_y = create_bins(df, [x[1] for x in wind_features], min_thresh=min_thresh)
+# Determine the size of the bins.
+print('------------------------------------------')
+print('Creating bins with size 5˚ by 2 knots...')
+bins, dx, dy, _, max_y = create_bins(df, [x[1] for x in wind_features])
 
-    # Plot and save the bins.
-    print('Creating plots...')
-    reports_path = './reports/{}/min_thresh_{}'.format(version, min_thresh)
-    plot_wind_angle_speed(df, [x[1] for x in wind_features], bins_axis_names, -180, 0, 180+1, max_y+1, dx, dy, 0.25, reports_path, 'bins')
-    reports_path = '{}/bins'.format(reports_path)
-    for bin_name, binned_df in bins.items():
-        bin_reports_path = '{}/{}'.format(reports_path, bin_name)
-        x_start, x_finish, y_start, y_finish = [int(s) for s in re.findall(bin_dimensions_regex, bin_name)]
-        dx, dy = (x_finish-x_start)/4.0, (y_finish-y_start)/4.0
-        plot_wind_angle_speed(binned_df, [x[1] for x in wind_features], bins_axis_names, x_start, y_start, x_finish+dx, y_finish+dy, dx, dy, 3, bin_reports_path, 'bin')
-        plot_boxplot(binned_df, boat_speed_feature[1], boxplot_axis_name, bin_reports_path, 'boxplot')
-        plot_corr(binned_df.drop([x[1] for x in identifier_features + wind_features], axis=1), boat_speed_feature[1], 20, bin_reports_path, 'corr')
-    print('All plots saved!')
+# Plot and save the bins.
+print('------------------------------------------')
+print('Creating plots...')
+reports_path = './reports/{}'.format(version)
+plot_wind_angle_speed(df, [x[1] for x in wind_features], bins_axis_names, -180, 0, 180+1, max_y+1, dx, dy, 0.25, reports_path, 'bins')
+reports_path = '{}/bins'.format(reports_path)
+for bin_name, binned_df in bins.items():
+    bin_reports_path = '{}/{}'.format(reports_path, bin_name)
+    x_start, x_finish, y_start, y_finish = [int(s) for s in re.findall(bin_dimensions_regex, bin_name)]
+    dx, dy = (x_finish-x_start)/4.0, (y_finish-y_start)/4.0
+    plot_wind_angle_speed(binned_df, [x[1] for x in wind_features], bins_axis_names, x_start, y_start, x_finish+dx, y_finish+dy, dx, dy, 3, bin_reports_path, 'bin')
+    plot_boxplot(binned_df, boat_speed_feature[1], boxplot_axis_name, bin_reports_path, 'boxplot')
+    plot_corr(binned_df.drop([x[1] for x in identifier_features + wind_features], axis=1), boat_speed_feature[1], 20, bin_reports_path, 'corr')
+print('All plots saved!')
+
 print('------------------------------------------')
 print('Bins creation finished!')

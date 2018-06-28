@@ -1,6 +1,3 @@
-# Possible bin angles.
-bin_angles = [5, 6, 8, 9, 10, 12, 15, 18, 20, 24, 30, 36, 40, 45, 60, 72]
-
 # List of relevant features and axis names.
 identifier_features = [
     ('Date', 'Date'),
