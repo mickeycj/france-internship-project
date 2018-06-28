@@ -27,14 +27,14 @@ def read_csv(fnames):
 
 def preprocess_data(df, identifier_cols, cols_to_transform, other_cols, regex):
     """Preprocess the dataset"""
-    print('Transforming columns...')
+    print('Preprocessing data...')
     transformed_df = pd.DataFrame()
     for old_col, new_col in identifier_cols + cols_to_transform + other_cols:
         if (old_col, new_col) not in identifier_cols + other_cols:
             transformed_df[new_col] = df.filter(regex=(regex.format(old_col))).mean(axis=1)
         else:
             transformed_df[new_col] = df[old_col]
-    print('Columns transformed!')
+    print('Preprocessing completed!')
     return transformed_df
 
 def create_bins(df, wind_features, dx=5, dy=2, min_thresh=5):
