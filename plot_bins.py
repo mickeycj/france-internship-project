@@ -63,16 +63,24 @@ def create_if_not_exist(path):
         os.makedirs(path)
         print('Directory {} created!'.format(path))
 
-def plot_wind_angle_speed(df, wind_features, axis_names, x_start, y_start, x_finish, y_finish, dx, dy, markersize, base_path, fname):
+def plot_wind_angle_speed(df, wind_features, axis_names, x_start, y_start, x_finish, y_finish, dx, dy, markersize, base_path, fname, main=False):
     """Plot the wind angle-speed space"""
     path = '{}/{}.pdf'.format(base_path, fname)
     print('Saving plot to {}'.format(path))
     plt.xlabel(axis_names[0])
     plt.ylabel(axis_names[1])
+    if main:
+        ax = plt.figure().gca()
+        ax.set_xticks(np.arange(x_start, x_finish, dx*6))
+        ax.set_xticks(np.arange(x_start, x_finish, dx), minor=True)
+        ax.set_yticks(np.arange(y_start, y_finish, dy))
+        plt.grid(which='major', lw=.75)
+        plt.grid(which='minor', lw=.5)
+    else:
+        plt.xlim(x_start, x_finish)
+        plt.ylim(y_start, y_finish)
+        plt.grid(lw=.75)
     plt.plot(df[wind_features[0]].tolist(), df[wind_features[1]].tolist(), 'ko', markersize=markersize)
-    plt.xticks(np.arange(x_start, x_finish, dx))
-    plt.yticks(np.arange(y_start, y_finish, dy))
-    plt.grid(lw=.75)
     plt.tight_layout()
     create_if_not_exist(base_path)
     plt.savefig(path)
@@ -148,13 +156,13 @@ bins, dx, dy, _, max_y = create_bins(df, [x[1] for x in wind_features])
 print('------------------------------------------')
 print('Creating plots...')
 reports_path = './reports/{}'.format(version)
-plot_wind_angle_speed(df, [x[1] for x in wind_features], bins_axis_names, -180, 0, 180+1, max_y+1, dx, dy, 0.25, reports_path, 'bins')
+plot_wind_angle_speed(df, [x[1] for x in wind_features], bins_axis_names, -180, 0, 180+1, max_y+1, dx, dy, 0.25, reports_path, 'bins', main=True)
 reports_path = '{}/bins'.format(reports_path)
 for bin_name, binned_df in bins.items():
     bin_reports_path = '{}/{}'.format(reports_path, bin_name)
     x_start, x_finish, y_start, y_finish = [int(s) for s in re.findall(bin_dimensions_regex, bin_name)]
     dx, dy = (x_finish-x_start)/4.0, (y_finish-y_start)/4.0
-    plot_wind_angle_speed(binned_df, [x[1] for x in wind_features], bins_axis_names, x_start, y_start, x_finish+dx, y_finish+dy, dx, dy, 3, bin_reports_path, 'bin')
+    plot_wind_angle_speed(binned_df, [x[1] for x in wind_features], bins_axis_names, x_start, y_start, x_finish, y_finish, dx, dy, 3, bin_reports_path, 'bin')
     plot_boxplot(binned_df, boat_speed_feature[1], boxplot_axis_name, bin_reports_path, 'boxplot')
     plot_corr(binned_df.drop([x[1] for x in identifier_features + wind_features], axis=1), boat_speed_feature[1], 20, bin_reports_path, 'corr')
 print('All plots saved!')
