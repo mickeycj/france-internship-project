@@ -112,7 +112,7 @@ def plot_boxplot(df, target_feature, axis_name, base_path, fname):
     """Plot the boxplot for boat speed"""
     path = '{}/{}.pdf'.format(base_path, fname)
     print('Saving plot to {}.'.format(path))
-    ax, _ = df.boxplot(column=target_feature, showfliers=df[target_feature].median() == df[target_feature].mode().iloc[0])
+    ax = sns.boxplot(y=target_feature, data=df)
     ax.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
     ax.set_ylabel(axis_name)
     plt.tight_layout()
