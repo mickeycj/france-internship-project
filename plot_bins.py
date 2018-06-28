@@ -156,7 +156,7 @@ data_path = './data/{}'.format(version)
 print('------------------------------------------')
 df = read_csv(map(lambda fname: '{}/{}.csv'.format(data_path, fname), fnames))
 
-# Preprocess the dataset to decrease the number of features.
+# Preprocess the dataset.
 print('------------------------------------------')
 df = preprocess_data(df,
                     identifier_features,
