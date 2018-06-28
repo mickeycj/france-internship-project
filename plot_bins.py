@@ -23,15 +23,141 @@ data_path = './data/{}'.format(version)
 bin_angles = [5, 6, 8, 9, 10, 12, 15, 18, 20, 24, 30, 36, 40, 45, 60, 72]
 
 # List of relevant features and axis names.
-if version =='v1':
-    wind_features = ['WTP_AW_angle', 'WTP_AW_speed']
-    boat_speed_feature = 'WTP_SelBoatSpd'
-elif version =='v2':
-    wind_features = ['VarFilter_WTP_AW_angle', 'VarFilter_WTP_AW_speed']
-    boat_speed_feature = 'VarFilter_WTP_SelBoatSpd'
-else:
-    print('This version number does not exist!')
-    exit()
+identifier_features = [
+    ('Date', 'Date'),
+    ('Hour', 'Timestamp'),
+    ('VarFilter_WTP_GPS1_lat', 'Latitude'),
+    ('VarFilter_WTP_GPS1_long', 'Longitude')
+]
+fiber_optics_structure_features = [
+    ('1s_FBM_P_TEMP', 'Front Beam - Temp. (Port)'),
+    ('1s_FBM_P_TEMP_To', 'Front Beam - Temp. To. (Port)'),
+    ('1s_FBM_P_To', 'Front Beam - To. (Port)'),
+    ('1s_FBM_P_laft', 'Front Beam - Lower Aft Rake (Port)'),
+    ('1s_FBM_P_laft', 'Front Beam - Lower Forward Rake (Port)'),
+    ('1s_FBM_P_uaft', 'Front Beam - Upper Aft Rake (Port)'),
+    ('1s_FBM_P_uaft', 'Front Beam - Upper Forward Rake (Port)'),
+    ('1s_FBM_S_TEMP', 'Front Beam - Temp. (Starboard)'),
+    ('1s_FBM_S_TEMP_To', 'Front Beam - Temp. To. (Starboard)'),
+    ('1s_FBM_S_To', 'Front Beam - To. (Starboard)'),
+    ('1s_FBM_S_laft', 'Front Beam - Lower Aft Rake (Starboard)'),
+    ('1s_FBM_S_laft', 'Front Beam - Lower Forward Rake (Starboard)'),
+    ('1s_FBM_S_uaft', 'Front Beam - Upper Aft Rake (Starboard)'),
+    ('1s_FBM_S_uaft', 'Front Beam - Upper Forward Rake (Starboard)'),
+    ('1s_HUL_C_TEMP', 'Hull - Temp. (Center)'),
+    ('1s_HUL_C_TEMP_To', 'Hull - Temp. To. (Center)'),
+    ('1s_HUL_C_To', 'Hull - To. (Center)'),
+    ('1s_HUL_C_lport', 'Hull - Lower Port (Center)'),
+    ('1s_HUL_C_lstbd', 'Hull - Lower Starboard (Center)'),
+    ('1s_HUL_C_uport', 'Hull - Upper Port (Center)'),
+    ('1s_HUL_C_ustbd', 'Hull - Upper Starboard (Center)'),
+    ('1s_HUL_P_TEMP', 'Hull - Temp. (Port)'),
+    ('1s_HUL_P_TEMP_To', 'Hull - Temp. To. (Port)'),
+    ('1s_HUL_P_To', 'Hull - To. (Port)'),
+    ('1s_HUL_P_lport', 'Hull - Lower Port (Port)'),
+    ('1s_HUL_P_lstbd', 'Hull - Lower Starboard (Port)'),
+    ('1s_HUL_P_uport', 'Hull - Upper Port (Port)'),
+    ('1s_HUL_P_ustbd', 'Hull - Upper Starboard (Port)'),
+    ('1s_HUL_S_TEMP', 'Hull - Temp. (Starboard)'),
+    ('1s_HUL_S_TEMP_To', 'Hull - Temp. To. (Starboard)'),
+    ('1s_HUL_S_To', 'Hull - To. (Starboard)'),
+    ('1s_HUL_S_lport', 'Hull - Lower Port (Starboard)'),
+    ('1s_HUL_S_lstbd', 'Hull - Lower Starboard (Starboard)'),
+    ('1s_HUL_S_uport', 'Hull - Upper Port (Starboard)'),
+    ('1s_HUL_S_ustbd', 'Hull - Upper Starboard (Starboard)')
+]
+fiber_optics_appendix_features = [
+    ('1s_Foil_B_P_1_TEMP', 'Board Temp. (Port)'),
+    ('1s_Foil_B_P_1_TEMP_To', 'Board Temp. To. (Port)'),
+    ('1s_Foil_B_P_1_To', 'Board To. (Port)'),
+    ('1s_Foil_B_P_1_i', 'Board Deformation - Inside (Port)'),
+    ('1s_Foil_B_P_1_o', 'Board Deformation - Outside (Port)'),
+    ('1s_Foil_B_S_1_TEMP', 'Board Temp. (Starboard)'),
+    ('1s_Foil_B_S_1_TEMP_To', 'Board Temp. To. (Starboard)'),
+    ('1s_Foil_B_S_1_To', 'Board To. (Starboard)'),
+    ('1s_Foil_B_S_1_i', 'Board Deformation - Inside (Starboard)'),
+    ('1s_Foil_B_S_1_o', 'Board Deformation - Outside (Starboard)'),
+    ('1s_Foil_RUD_C_1_TEMP', 'Board Temp. (Center)'),
+    ('1s_Foil_RUD_C_1_TEMP_To', 'Board Temp. To. (Center)'),
+    ('1s_Foil_RUD_C_To', 'Board To. (Center)'),
+    ('1s_Foil_RUD_C_1_e_0_P', 'Rudder - Port (Center)'),
+    ('1s_Foil_RUD_C_1_e_0_S', 'Rudder - Starboard (Center)')
+]
+inertial_features = [
+    ('IxBlue_Heading', 'IxB - Heading'),
+    ('IxBlue_Heave', 'IxB - Heave'),
+    ('IxBlue_HeaveAccel', 'IxB - Heave Accel.'),
+    ('IxBlue_Pitch', 'IxB - Pitch'),
+    ('IxBlue_PitchRate', 'IxB - Pitch RAte'),
+    ('IxBlue_Roll', 'IxB - Roll'),
+    ('IxBlue_RollRate', 'IxB - Roll Rate'),
+    ('IxBlue_SurgeAccel', 'IxB - Surge Accel.'),
+    ('IxBlue_SwayAccel', 'IxB - Sway Accel.'),
+    ('IxBlue_YawRate', 'IxB - Yaw Rate')
+]
+other_sensor_features = [
+    ('RM_RM', 'Righting Moment'),
+    ('VarFilter_sirius_b2_ 1', 'Mainsail 2'),
+    ('VarFilter_sirius_b2_ 2', 'Mainsail 1'),
+    ('VarFilter_sirius_b2_ 3', 'Mainsail Full'),
+    ('VarFilter_WTP_Mainsheet_Load', 'Mainsail Load'),
+    ('VarFilter_WTP_Forestay_0_Load', 'Forestay Load (J0)'),
+    ('VarFilter_WTP_Forestay_1_Load', 'Forestay Load (J1)'),
+    ('VarFilter_WTP_Forestay_2_Load', 'Forestay Load (J2)'),
+    ('VarFilter_WTP_Forestay_3_Load', 'Forestay Load (J3)'),
+    ('VarFilter_WTP_MastRot', 'Mast Rotation Angle'),
+    ('VarFilter_WTP_CBoard_Elevator_angle', 'Board - Elevator Angle (Center)'),
+    ('VarFilter_WTP_CBoard_Trimmer_angle', 'Board - Trimmer Angle (Center)'),
+    ('VarFilter_WTP_Cboard_Extension', 'Board - Extension (Center)'),
+    ('VarFilter_WTP_Cboard_Load', 'Board - Load (Center)'),
+    ('VarFilter_WTP_Cboard_Load_Dwn', 'Board - Down Load (Center)'),
+    ('VarFilter_WTP_Cboard_Load_Up', 'Board - Up Load (Center)'),
+    ('VarFilter_WTP_Foil_Prt_Extension', 'Board - Extension (Port)'),
+    ('VarFilter_WTP_Foil_Prt_Load', 'Board - Load (Port)'),
+    ('VarFilter_WTP_Foil_Prt_Load_Dwn', 'Board - Down Load (Port)'),
+    ('VarFilter_WTP_Foil_Prt_Load_Up', 'Board - Up Load (Port)'),
+    ('VarFilter_WTP_Foil_Prt_Rake', 'Board - Rake (Port)'),
+    ('VarFilter_WTP_Foil_Prt_Rake_pressure', 'Board - Rake Pressure (Port)'),
+    ('VarFilter_WTP_Foil_Stb_Extension', 'Board - Extension (Starboard)'),
+    ('VarFilter_WTP_Foil_Stb_Load', 'Board - Load (Starboard)'),
+    ('VarFilter_WTP_Foil_Stb_Load_Dwn', 'Board - Down Load (Starboard)'),
+    ('VarFilter_WTP_Foil_Stb_Load_Up', 'Board - Up Load (Starboard)'),
+    ('VarFilter_WTP_Foil_Stb_Rake', 'Board - Rake (Starboard)'),
+    ('VarFilter_WTP_Foil_Stb_Rake_pressure', 'Board - Rake Pressure (Starboard)'),
+    ('VarFilter_WTP_Rudder_Angle_CC', 'Rudder - Angle (Center)'),
+    ('VarFilter_WTP_Rudder_CC_Elevator_angle', 'Rudder - Elevator Angle (Center)'),
+    ('VarFilter_WTP_Rudder_CC_Load', 'Rudder - Load (Center)'),
+    ('VarFilter_WTP_Rudder_CC_Load_Prt', 'Rudder - Port Load (Center)'),
+    ('VarFilter_WTP_Rudder_CC_Load_Stb', 'Rudder - Starboard Load (Center)'),
+    ('VarFilter_WTP_Rudder_Angle_Prt', 'Rudder - Angle (Port)'),
+    ('VarFilter_WTP_Rudder_Prt_Elevator_angle', 'Rudder - Elevator Angle (Port)'),
+    ('VarFilter_WTP_Rudder_Prt_Load_I', 'Rudder - Inside Load (Port)'),
+    ('VarFilter_WTP_Rudder_Prt_Load_O', 'Rudder - Outside Load (Port)'),
+    ('VarFilter_WTP_Rudder_Angle_Stb', 'Rudder - Angle (Starboard)'),
+    ('VarFilter_WTP_Rudder_Stb_Elevator_angle', 'Rudder - Elevator Angle (Starboard)'),
+    ('VarFilter_WTP_Rudder_Stb_Load_I', 'Rudder - Inside Load (Starboard)'),
+    ('VarFilter_WTP_Rudder_Stb_Load_O', 'Rudder - Outside Load (Starboard)'),
+    ('VarFilter_WTP_Shroud_Prt_Load', 'Shroud - Load (Port)'),
+    ('VarFilter_WTP_Shroud_Stb_Load', 'Shroud - Load (Starboard)')
+]
+wind_features = [
+    ('VarFilter_WTP_TW_angle', 'Wind Angle'),
+    ('VarFilter_WTP_TW_speed', 'Wind Speed'),
+    ('VarFilter_WTP_AW_angle', 'Apparant Wind Angle'),
+    ('VarFilter_WTP_AW_speed', 'Apparant Wind Speed'),
+    ('VarFilter_WTP_MW_angle', 'Measured Wind Angle'),
+    ('VarFilter_WTP_MW_speed', 'Measured Wind Speed')
+]
+target_features = [
+    ('VarFilter_WTP_SelBoatSpd', 'Boat Speed'),
+    ('VarFilter_WTP_SelSOG', 'Speed Over Ground'),
+    ('VarFilter_WTP_SelCOG', 'Course Over Ground'),
+    ('VarFilter_WTP_SelHdg', 'Heading'),
+    ('VarFilter_WTP_SelHeel', 'Heel'),
+    ('VarFilter_WTP_SelTrim', 'Trim')
+]
+old_wind_features = ['VarFilter_WTP_AW_angle', 'VarFilter_WTP_AW_speed']
+boat_speed_feature = 'VarFilter_WTP_SelBoatSpd'
 bins_axis_names = ['Wind Angle (˚)', 'Wind Speed (knots)']
 boxplot_axis_name = 'Boat Speed (knots)'
 
@@ -73,8 +199,8 @@ def create_bins(df, dx=bin_angles[0], dy=1, min_thresh=10, tries=0):
     max_x = -180
     while max_x < 180:
         max_y = 0
-        while max_y < math.ceil(df[wind_features[1]].max()):
-            binned_df = df.query('{0} >= {2} and {0} < {2}+{4} & {1} >= {3} & {1} < {3}+{5}'.format(wind_features[0], wind_features[1], max_x, max_y, dx, dy))
+        while max_y < math.ceil(df[old_wind_features[1]].max()):
+            binned_df = df.query('{0} >= {2} and {0} < {2}+{4} & {1} >= {3} & {1} < {3}+{5}'.format(old_wind_features[0], old_wind_features[1], max_x, max_y, dx, dy))
             if len(binned_df) >= int(math.ceil(min_thresh*0.1)):
                 if len(binned_df) < min_thresh:
                     return create_bins(df, dx=bin_angles[tries+1], dy=dy+1, min_thresh=min_thresh, tries=tries+1)
@@ -100,7 +226,7 @@ def plot_wind_angle_speed(df, x_start, y_start, x_finish, y_finish, dx, dy, mark
     print('Saving plot to {}'.format(path))
     plt.xlabel(bins_axis_names[0])
     plt.ylabel(bins_axis_names[1])
-    plt.plot(df[wind_features[0]].tolist(), df[wind_features[1]].tolist(), 'ko', markersize=markersize)
+    plt.plot(df[old_wind_features[0]].tolist(), df[old_wind_features[1]].tolist(), 'ko', markersize=markersize)
     plt.xticks(np.arange(x_start, x_finish, dx))
     plt.yticks(np.arange(y_start, y_finish, dy))
     plt.grid(lw=.75)
@@ -126,7 +252,7 @@ def plot_corr(df, num_features, base_path, fname):
     path = '{}/{}.pdf'.format(base_path, fname)
     print('Saving plot to {}'.format(path))
     corrs = {}
-    for col in df.drop(wind_features, axis=1).columns:
+    for col in df.drop(old_wind_features, axis=1).columns:
         if col != boat_speed_feature:
             corr = df[boat_speed_feature].corr(df[col])
             if not math.isnan(corr):
@@ -160,7 +286,7 @@ df = transform_columns(df,
                     '1s_Foil_B_S_01_i', '1s_Foil_B_S_01_o',
                     '1s_Foil_ELE_C_01_p', '1s_Foil_ELE_C_01_s',
                     '1s_Foil_ELE_LOAD_P', '1s_Foil_ELE_LOAD_S'],
-                    wind_features + [boat_speed_feature],
+                    old_wind_features + [boat_speed_feature],
                     feature_regex)
 
 # Create different-sized bins.
