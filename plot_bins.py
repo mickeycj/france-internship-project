@@ -11,7 +11,10 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from constants import *
+from constants import bins_axis_names, bin_dimensions_regex, boat_speed_feature, \
+                    boxplot_axis_name, feature_regex, identifier_features, \
+                    fiber_optics_structure_features, fiber_optics_appendix_features, \
+                    other_sensor_features, wind_features
 
 def read_csv(fnames):
     """Read CSV file(s) to a Pandas Dataframe"""
