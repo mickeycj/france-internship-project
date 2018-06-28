@@ -69,7 +69,7 @@ def create_if_not_exist(path):
 def plot_wind_angle_speed(df, wind_features, axis_names, x_start, y_start, x_finish, y_finish, dx, dy, markersize, base_path, fname, main=False):
     """Plot the wind angle-speed space"""
     path = '{}/{}.pdf'.format(base_path, fname)
-    print('Saving plot to {}'.format(path))
+    print('Saving plot to {}.'.format(path))
     plt.xlabel(axis_names[0])
     plt.ylabel(axis_names[1])
     if main:
@@ -90,7 +90,7 @@ def plot_wind_angle_speed(df, wind_features, axis_names, x_start, y_start, x_fin
 def plot_boxplot(df, target_feature, axis_name, base_path, fname):
     """Plot the boxplot for boat speed"""
     path = '{}/{}.pdf'.format(base_path, fname)
-    print('Saving plot to {}'.format(path))
+    print('Saving plot to {}.'.format(path))
     df.boxplot(column=target_feature, showfliers=df[target_feature].median() == df[target_feature].mode().iloc[0])
     plt.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
     plt.ylabel(axis_name)
@@ -102,7 +102,7 @@ def plot_boxplot(df, target_feature, axis_name, base_path, fname):
 def plot_corr(df, target_feature, num_features, base_path, fname):
     """Plot the correlations with boat speed"""
     path = '{}/{}.pdf'.format(base_path, fname)
-    print('Saving plot to {}'.format(path))
+    print('Saving plot to {}.'.format(path))
     corrs = {}
     for col in df.columns:
         if col != target_feature:
@@ -180,10 +180,10 @@ print('------------------------------------------')
 print('Removing null bins...')
 reports_path = './reports/{}/bins'.format(version)
 for bin_name in null_bins:
-    print('Deleting {}'.format(bin_name))
+    print('Deleting {}.'.format(bin_name))
     del bins[bin_name]
     bin_reports_path = '{}/{}'.format(reports_path, bin_name)
-    print('Deleting {} directory'.format(bin_reports_path))
+    print('Deleting {} directory.'.format(bin_reports_path))
     shutil.rmtree(bin_reports_path)
 bins['num_bins'] = bins['num_bins'] - len(null_bins)
 print('Bins updated!')
