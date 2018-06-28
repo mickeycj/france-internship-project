@@ -37,6 +37,7 @@ def transform_columns(df, identifier_cols, cols_to_transform, other_cols, regex)
 
 def create_bins(df, wind_features, dx=5, dy=2, min_thresh=5):
     """Create bins"""
+    print('Creating bins with size {}˚ by {}} knots...'.format(dx, dy))
     bins = {}
     num_bins = 0
     max_x = -180
@@ -47,8 +48,8 @@ def create_bins(df, wind_features, dx=5, dy=2, min_thresh=5):
             bin_size = len(binned_df)
             if bin_size >= min_thresh:
                 bin_name = 'bin_x{}to{}_y{}to{}'.format(max_x, max_x+dx, max_y, max_y+dy)
-                print('Creating {}...'.format(bin_name))
-                print('Bin size: {}'.format(bin_size))
+                print('Bin {} created!'.format(bin_name))
+                print('Bin size: {}.'.format(bin_size))
                 bins[bin_name] = binned_df
                 num_bins+=1
             max_y+=dy
@@ -149,7 +150,6 @@ df = transform_columns(df,
 
 # Determine the size of the bins.
 print('------------------------------------------')
-print('Creating bins with size 5˚ by 2 knots...')
 bins, dx, dy, _, max_y = create_bins(df, [x[1] for x in wind_features])
 
 # Plot and save the bins.
