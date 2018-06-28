@@ -100,10 +100,11 @@ def plot_wind_angle_speed(df, wind_features, axis_names, x_start, y_start, x_fin
         ax.set_xticks(np.arange(x_start, x_finish, dx*6))
         ax.set_xticks(np.arange(x_start, x_finish, dx), minor=True)
         ax.set_yticks(np.arange(y_start, y_finish, dy))
+        ax.grid(which='both', lw=.75)
     else:
         ax.set_xlim(x_start, x_finish)
         ax.set_ylim(y_start, y_finish)
-    ax.grid(lw=.75)
+        ax.grid(lw=.75)
     plt.tight_layout()
     plt.savefig(path)
     plt.clf()
