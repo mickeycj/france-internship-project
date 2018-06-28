@@ -2,6 +2,7 @@ import math
 import os
 import re
 import sys
+import warnings
 
 import chardet
 import matplotlib.pyplot as plt
@@ -123,6 +124,7 @@ def plot_corr(df, target_feature, num_features, base_path, fname):
 
 print('Initializing bins creation...')
 print('------------------------------------------')
+warnings.filterwarnings('ignore')
 
 # Ignore PyPlot warning.
 print('Setting up PyPlot...')
