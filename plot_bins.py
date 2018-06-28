@@ -37,7 +37,7 @@ def transform_columns(df, identifier_cols, cols_to_transform, other_cols, regex)
 
 def create_bins(df, wind_features, dx=5, dy=2, min_thresh=5):
     """Create bins"""
-    print('Creating bins with size {}˚ by {}} knots...'.format(dx, dy))
+    print('Creating bins with size {}˚ by {} knots...'.format(dx, dy))
     bins = {}
     num_bins = 0
     max_x = -180
@@ -122,6 +122,7 @@ def plot_corr(df, target_feature, num_features, base_path, fname):
     plt.clf()
 
 print('Initializing bins creation...')
+print('------------------------------------------')
 
 # Ignore PyPlot warning.
 print('Setting up PyPlot...')
@@ -148,7 +149,7 @@ df = transform_columns(df,
                     other_sensor_features + wind_features + [boat_speed_feature],
                     feature_regex)
 
-# Determine the size of the bins.
+# Create the bins.
 print('------------------------------------------')
 bins, dx, dy, _, max_y = create_bins(df, [x[1] for x in wind_features])
 
