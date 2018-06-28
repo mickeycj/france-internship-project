@@ -1,6 +1,7 @@
 import math
 import os
 import re
+import shutil
 import sys
 import warnings
 
@@ -24,8 +25,8 @@ def read_csv(fnames):
     print('Dataframe created!')
     return df
 
-def transform_columns(df, identifier_cols, cols_to_transform, other_cols, regex):
-    """Transform the dataset"""
+def preprocess_data(df, identifier_cols, cols_to_transform, other_cols, regex):
+    """Preprocess the dataset"""
     print('Transforming columns...')
     transformed_df = pd.DataFrame()
     for old_col, new_col in identifier_cols + cols_to_transform + other_cols:
@@ -111,14 +112,18 @@ def plot_corr(df, target_feature, num_features, base_path, fname):
     sorted_corrs = sorted(corrs.items(), key=lambda x: abs(x[1]), reverse=True)[:num_features]
     sorted_corrs = sorted(sorted_corrs, key=lambda x: x[1], reverse=True)
     cols = [target_feature] + [x[0] for x in sorted_corrs]
-    corr = df[cols].corr()
-    sns.heatmap(corr, xticklabels=corr.columns, yticklabels=corr.columns, lw=.75)
-    plt.xticks(rotation=30, ha='right', fontsize=5)
-    plt.yticks(fontsize=5)
-    plt.tight_layout()
-    create_if_not_exist(base_path)
-    plt.savefig(path)
-    plt.clf()
+    if len(cols) > 1:
+        corr = df[cols].corr()
+        sns.heatmap(corr, xticklabels=corr.columns, yticklabels=corr.columns, lw=.75)
+        plt.xticks(rotation=30, ha='right', fontsize=5)
+        plt.yticks(fontsize=5)
+        plt.tight_layout()
+        create_if_not_exist(base_path)
+        plt.savefig(path)
+        plt.clf()
+        return True
+    else:
+        return False
 
 print('Initializing bins creation...')
 print('------------------------------------------')
@@ -141,9 +146,9 @@ data_path = './data/{}'.format(version)
 print('------------------------------------------')
 df = read_csv(map(lambda arg: '{}/{}.csv'.format(data_path, arg), fnames))
 
-# Transform the dataset to decrease the number of features.
+# Preprocess the dataset to decrease the number of features.
 print('------------------------------------------')
-df = transform_columns(df,
+df = preprocess_data(df,
                     identifier_features,
                     fiber_optics_structure_features + fiber_optics_appendix_features,
                     other_sensor_features + wind_features + [boat_speed_feature],
@@ -159,14 +164,30 @@ print('Creating plots...')
 reports_path = './reports/{}'.format(version)
 plot_wind_angle_speed(df, [x[1] for x in wind_features], bins_axis_names, -180, 0, 180+1, max_y+1, dx, dy, 0.25, reports_path, 'bins', main=True)
 reports_path = '{}/bins'.format(reports_path)
+null_bins = []
 for bin_name, binned_df in bins.items():
-    bin_reports_path = '{}/{}'.format(reports_path, bin_name)
-    x_start, x_finish, y_start, y_finish = [int(s) for s in re.findall(bin_dimensions_regex, bin_name)]
-    dx, dy = (x_finish-x_start)/4.0, (y_finish-y_start)/4.0
-    plot_wind_angle_speed(binned_df, [x[1] for x in wind_features], bins_axis_names, x_start, y_start, x_finish, y_finish, dx, dy, 3, bin_reports_path, 'bin')
-    plot_boxplot(binned_df, boat_speed_feature[1], boxplot_axis_name, bin_reports_path, 'boxplot')
-    plot_corr(binned_df.drop([x[1] for x in identifier_features + wind_features], axis=1), boat_speed_feature[1], 20, bin_reports_path, 'corr')
+    if bin_name != 'num_bins':
+        bin_reports_path = '{}/{}'.format(reports_path, bin_name)
+        x_start, x_finish, y_start, y_finish = [int(s) for s in re.findall(bin_dimensions_regex, bin_name)]
+        dx, dy = (x_finish-x_start)/4.0, (y_finish-y_start)/4.0
+        plot_wind_angle_speed(binned_df, [x[1] for x in wind_features], bins_axis_names, x_start, y_start, x_finish, y_finish, dx, dy, 3, bin_reports_path, 'bin')
+        plot_boxplot(binned_df, boat_speed_feature[1], boxplot_axis_name, bin_reports_path, 'boxplot')
+        if not plot_corr(binned_df.drop([x[1] for x in identifier_features + wind_features], axis=1), boat_speed_feature[1], 20, bin_reports_path, 'corr'):
+            null_bins.append(bin_name)
 print('All plots saved!')
+
+print('------------------------------------------')
+print('Removing null bins...')
+reports_path = './reports/{}/bins'.format(version)
+for bin_name in null_bins:
+    print('Deleting {}'.format(bin_name))
+    del bins[bin_name]
+    bin_reports_path = '{}/{}'.format(reports_path, bin_name)
+    print('Deleting {} directory'.format(bin_reports_path))
+    shutil.rmtree(bin_reports_path)
+bins['num_bins'] = bins['num_bins'] - len(null_bins)
+print('Bins updated!')
+print('Number of bins: {}.'.format(bins['num_bins']))
 
 print('------------------------------------------')
 print('Bins creation finished!')
