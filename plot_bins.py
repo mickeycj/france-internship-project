@@ -37,6 +37,20 @@ def preprocess_data(df, identifier_cols, cols_to_transform, other_cols, regex):
     print('Preprocessing completed!')
     return transformed_df
 
+def compute_corr(df, target_feature, num_features):
+    corrs = {}
+    for col in df.drop([x[1] for x in identifier_features + wind_features], axis=1).columns:
+        if col != target_feature:
+            corr = df[target_feature].corr(df[col])
+            if not math.isnan(corr):
+                corrs[col] = corr
+    sorted_corrs = sorted(corrs.items(), key=lambda x: abs(x[1]), reverse=True)[:num_features]
+    sorted_corrs = sorted(sorted_corrs, key=lambda x: x[1], reverse=True)
+    cols = [target_feature] + [x[0] for x in sorted_corrs]
+    if len(cols) <= 1:
+        return None
+    return df[cols].corr()
+
 def create_bins(df, wind_features, dx=5, dy=2, min_thresh=5):
     """Create bins"""
     print('Creating bins with size {}˚ by {} knots...'.format(dx, dy))
@@ -48,11 +62,15 @@ def create_bins(df, wind_features, dx=5, dy=2, min_thresh=5):
         while max_y < math.ceil(df[wind_features[1]].max()):
             binned_df = df.query('{0} >= {2} and {0} < {2}+{4} & {1} >= {3} & {1} < {3}+{5}'.format(wind_features[0], wind_features[1], max_x, max_y, dx, dy))
             bin_size = len(binned_df)
-            if bin_size >= min_thresh:
+            bin_corr = compute_corr(binned_df, boat_speed_feature[1], 20)
+            if bin_size >= min_thresh and bin_corr is not None:
                 bin_name = 'bin_x{}to{}_y{}to{}'.format(max_x, max_x+dx, max_y, max_y+dy)
                 print('Bin {} created!'.format(bin_name))
                 print('Bin size: {}.'.format(bin_size))
-                bins[bin_name] = binned_df
+                bins[bin_name] = {}
+                bins[bin_name]['bin'] = binned_df
+                bins[bin_name]['size'] = bin_size
+                bins[bin_name]['corr'] = bin_corr
                 num_bins+=1
             max_y+=dy
         max_x+=dx
@@ -99,31 +117,17 @@ def plot_boxplot(df, target_feature, axis_name, base_path, fname):
     plt.savefig(path)
     plt.clf()
 
-def plot_corr(df, target_feature, num_features, base_path, fname):
+def plot_corr(df, corr, base_path, fname):
     """Plot the correlations with boat speed"""
     path = '{}/{}.pdf'.format(base_path, fname)
     print('Saving plot to {}.'.format(path))
-    corrs = {}
-    for col in df.columns:
-        if col != target_feature:
-            corr = df[target_feature].corr(df[col])
-            if not math.isnan(corr):
-                corrs[col] = corr
-    sorted_corrs = sorted(corrs.items(), key=lambda x: abs(x[1]), reverse=True)[:num_features]
-    sorted_corrs = sorted(sorted_corrs, key=lambda x: x[1], reverse=True)
-    cols = [target_feature] + [x[0] for x in sorted_corrs]
-    if len(cols) > 1:
-        corr = df[cols].corr()
-        sns.heatmap(corr, xticklabels=corr.columns, yticklabels=corr.columns, lw=.75)
-        plt.xticks(rotation=30, ha='right', fontsize=5)
-        plt.yticks(fontsize=5)
-        plt.tight_layout()
-        create_if_not_exist(base_path)
-        plt.savefig(path)
-        plt.clf()
-        return True
-    else:
-        return False
+    sns.heatmap(corr, xticklabels=corr.columns, yticklabels=corr.columns, lw=.75)
+    plt.xticks(rotation=30, ha='right', fontsize=5)
+    plt.yticks(fontsize=5)
+    plt.tight_layout()
+    create_if_not_exist(base_path)
+    plt.savefig(path)
+    plt.clf()
 
 print('Initializing bins creation...')
 print('------------------------------------------')
@@ -164,30 +168,16 @@ print('Creating plots...')
 reports_path = './reports/{}'.format(version)
 plot_wind_angle_speed(df, [x[1] for x in wind_features], bins_axis_names, -180, 0, 180+1, max_y+1, dx, dy, 0.25, reports_path, 'bins', main=True)
 reports_path = '{}/bins'.format(reports_path)
-null_bins = []
-for bin_name, binned_df in bins.items():
+for bin_name, bin_items in bins.items():
     if bin_name != 'num_bins':
+        binned_df, bin_corr = bin_items['bin'], bin_items['corr']
         bin_reports_path = '{}/{}'.format(reports_path, bin_name)
         x_start, x_finish, y_start, y_finish = [int(s) for s in re.findall(bin_dimensions_regex, bin_name)]
         dx, dy = (x_finish-x_start)/4.0, (y_finish-y_start)/4.0
         plot_wind_angle_speed(binned_df, [x[1] for x in wind_features], bins_axis_names, x_start, y_start, x_finish, y_finish, dx, dy, 3, bin_reports_path, 'bin')
         plot_boxplot(binned_df, boat_speed_feature[1], boxplot_axis_name, bin_reports_path, 'boxplot')
-        if not plot_corr(binned_df.drop([x[1] for x in identifier_features + wind_features], axis=1), boat_speed_feature[1], 20, bin_reports_path, 'corr'):
-            null_bins.append(bin_name)
+        plot_corr(binned_df, bin_corr, bin_reports_path, 'corr')
 print('All plots saved!')
-
-print('------------------------------------------')
-print('Removing null bins...')
-reports_path = './reports/{}/bins'.format(version)
-for bin_name in null_bins:
-    print('Deleting {}.'.format(bin_name))
-    del bins[bin_name]
-    bin_reports_path = '{}/{}'.format(reports_path, bin_name)
-    print('Deleting {} directory.'.format(bin_reports_path))
-    shutil.rmtree(bin_reports_path)
-bins['num_bins'] = bins['num_bins'] - len(null_bins)
-print('Bins updated!')
-print('Number of bins: {}.'.format(bins['num_bins']))
 
 print('------------------------------------------')
 print('Bins creation finished!')
