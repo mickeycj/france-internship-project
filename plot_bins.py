@@ -89,6 +89,7 @@ def create_if_not_exist(path):
 
 def plot_wind_angle_speed(df, wind_features, axis_names, x_start, y_start, x_finish, y_finish, dx, dy, markersize, base_path, fname, main=False):
     """Plot the wind angle-speed space"""
+    create_if_not_exist(base_path)
     path = '{}/{}.pdf'.format(base_path, fname)
     print('Saving plot to {}.'.format(path))
     _, ax = plt.subplots()
@@ -104,31 +105,30 @@ def plot_wind_angle_speed(df, wind_features, axis_names, x_start, y_start, x_fin
         ax.set_ylim(y_start, y_finish)
     ax.grid(lw=.75)
     plt.tight_layout()
-    create_if_not_exist(base_path)
     plt.savefig(path)
     plt.clf()
 
 def plot_boxplot(df, target_feature, axis_name, base_path, fname):
     """Plot the boxplot for boat speed"""
+    create_if_not_exist(base_path)
     path = '{}/{}.pdf'.format(base_path, fname)
     print('Saving plot to {}.'.format(path))
     ax = sns.boxplot(y=target_feature, data=df)
     ax.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
     ax.set_ylabel(axis_name)
     plt.tight_layout()
-    create_if_not_exist(base_path)
     plt.savefig(path)
     plt.clf()
 
 def plot_corr(df, corr, base_path, fname):
     """Plot the correlations with boat speed"""
     path = '{}/{}.pdf'.format(base_path, fname)
+    create_if_not_exist(base_path)
     print('Saving plot to {}.'.format(path))
     sns.heatmap(corr, xticklabels=corr.columns, yticklabels=corr.columns, lw=.75)
     plt.xticks(rotation=30, ha='right', fontsize=5)
     plt.yticks(fontsize=5)
     plt.tight_layout()
-    create_if_not_exist(base_path)
     plt.savefig(path)
     plt.clf()
 
