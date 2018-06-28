@@ -154,7 +154,7 @@ data_path = './data/{}'.format(version)
 
 # Read from CSV file(s).
 print('------------------------------------------')
-df = read_csv(map(lambda arg: '{}/{}.csv'.format(data_path, arg), fnames))
+df = read_csv(map(lambda fname: '{}/{}.csv'.format(data_path, fname), fnames))
 
 # Preprocess the dataset to decrease the number of features.
 print('------------------------------------------')
