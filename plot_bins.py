@@ -134,19 +134,22 @@ def plot_corr(df, corr, base_path, fname):
 
 print('Initializing bins creation...')
 print('------------------------------------------')
-warnings.filterwarnings('ignore')
-
-# Ignore PyPlot warning.
-print('Setting up PyPlot...')
-plt.rcParams.update({'figure.max_open_warning': 0})
 
 # Command line arguments.
 print('Retrieving command line arguments...')
 version = sys.argv[1]
 fnames = sys.argv[2:]
 
+# Ignore RunTimeWarning.
+print('Setting up warning...')
+warnings.filterwarnings('ignore')
+
+# Ignore PyPlot warning.
+print('Setting up PyPlot...')
+plt.rcParams.update({'figure.max_open_warning': 0})
+
 # Data path.
-print('Setting up path to data...')
+print('Setting up data path...')
 data_path = './data/{}'.format(version)
 
 # Read from CSV file(s).
