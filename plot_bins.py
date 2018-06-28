@@ -124,9 +124,9 @@ def plot_corr(df, corr, base_path, fname):
     """Plot the correlations with boat speed"""
     path = '{}/{}.pdf'.format(base_path, fname)
     print('Saving plot to {}.'.format(path))
-    ax = sns.heatmap(corr, xticklabels=corr.columns, yticklabels=corr.columns, lw=.75)
-    ax.set_xticks(rotation=30, ha='right', fontsize=5)
-    ax.set_yticks(fontsize=5)
+    sns.heatmap(corr, xticklabels=corr.columns, yticklabels=corr.columns, lw=.75)
+    plt.xticks(rotation=30, ha='right', fontsize=5)
+    plt.yticks(fontsize=5)
     plt.tight_layout()
     create_if_not_exist(base_path)
     plt.savefig(path)
