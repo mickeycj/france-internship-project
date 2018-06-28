@@ -28,17 +28,17 @@ def read_csv(fnames):
     print('Dataframe created!')
     return df
 
-def preprocess_data(df, identifier_cols, cols_to_transform, other_cols, regex):
+def preprocess_data(df, identifier_cols, cols_to_preprocess, other_cols, regex):
     """Preprocess the dataset"""
     print('Preprocessing data...')
-    transformed_df = pd.DataFrame()
-    for old_col, new_col in identifier_cols + cols_to_transform + other_cols:
+    preprocessed_df = pd.DataFrame()
+    for old_col, new_col in identifier_cols + cols_to_preprocess + other_cols:
         if (old_col, new_col) not in identifier_cols + other_cols:
-            transformed_df[new_col] = df.filter(regex=(regex.format(old_col))).mean(axis=1)
+            preprocessed_df[new_col] = df.filter(regex=(regex.format(old_col))).mean(axis=1)
         else:
-            transformed_df[new_col] = df[old_col]
+            preprocessed_df[new_col] = df[old_col]
     print('Preprocessing completed!')
-    return transformed_df
+    return preprocessed_df
 
 def compute_corr(df, target_feature, num_features):
     corrs = {}
