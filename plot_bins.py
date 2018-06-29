@@ -41,6 +41,7 @@ def preprocess_data(df, identifier_cols, cols_to_preprocess, other_cols, regex):
     return preprocessed_df
 
 def compute_corr(df, target_feature, num_features):
+    """Compute top correlated features with the target feature"""
     corrs = {}
     for col in df.drop([x[1] for x in identifier_features + wind_features], axis=1).columns:
         if col != target_feature:
