@@ -64,7 +64,7 @@ def create_bins(df, wind_features, dx=5, dy=2, min_thresh=5):
     while max_x < 180:
         max_y = 0
         while max_y < math.ceil(df[wind_features[1]].max()):
-            binned_df = df.query('{0} >= {2} and {0} < {2}+{4} & {1} >= {3} & {1} < {3}+{5}'.format(wind_features[0], wind_features[1], max_x, max_y, dx, dy))
+            binned_df = df.query('{0} >= {2} and {0} < {2}+{4} and {1} >= {3} and {1} < {3}+{5}'.format(wind_features[0], wind_features[1], max_x, max_y, dx, dy))
             bin_size = len(binned_df)
             bin_corr = compute_corr(binned_df, boat_speed_feature[1], 20)
             if bin_size >= min_thresh and bin_corr is not None:
