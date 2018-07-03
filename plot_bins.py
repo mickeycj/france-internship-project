@@ -40,7 +40,7 @@ def preprocess_data(df, identifier_cols, cols_to_preprocess, other_cols, regex):
     print('Preprocessing completed!')
     return preprocessed_df
 
-def compute_corr(df, target_feature, num_features):
+def compute_corr(df, target_feature, num_features=50):
     """Compute top correlated features with the target feature"""
     corrs = {}
     for col in df.columns:
@@ -65,7 +65,7 @@ def create_bins(df, wind_features, target_feature, dx=5, dy=2, min_thresh=5, exc
         while max_y < math.ceil(df[wind_features[1]].max()):
             binned_df = df.query('{0} >= {2} and {0} < {2}+{4} and {1} >= {3} and {1} < {3}+{5}'.format(wind_features[0], wind_features[1], max_x, max_y, dx, dy))
             bin_size = len(binned_df)
-            bin_corr = compute_corr(binned_df.drop([x[1] for x in exclude], axis=1), target_feature, 20)
+            bin_corr = compute_corr(binned_df.drop([x[1] for x in exclude], axis=1), target_feature)
             if bin_size >= min_thresh and bin_corr is not None:
                 bin_name = 'bin_x{}to{}_y{}to{}'.format(max_x, max_x+dx, max_y, max_y+dy)
                 print('Bin {} created!'.format(bin_name))
@@ -121,9 +121,9 @@ def plot_corr(df, corr, base_path, fname):
     path = '{}/{}.pdf'.format(base_path, fname)
     create_if_not_exist(base_path)
     print('Saving plot to {}.'.format(path))
-    sns.heatmap(corr, xticklabels=corr.columns, yticklabels=corr.columns, lw=.75)
-    plt.xticks(rotation=30, ha='right', fontsize=5)
-    plt.yticks(fontsize=5)
+    sns.heatmap(corr, xticklabels=corr.columns, yticklabels=corr.columns)
+    plt.xticks(rotation=30, ha='right', fontsize=3)
+    plt.yticks(fontsize=3)
     plt.tight_layout()
     plt.savefig(path)
     plt.clf()
