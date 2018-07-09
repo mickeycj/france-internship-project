@@ -59,10 +59,8 @@ def create_bins(df, wind_features, target_feature, dx=5, dy=2, min_thresh=5, exc
     """Create bins"""
     print('Creating bins with size {}˚ by {} knots...'.format(dx, dy))
     bins = {}
-    max_x = -180
-    while max_x < 180:
-        max_y = 0
-        while max_y < math.ceil(df[wind_features[1]].max()):
+    for max_x in range(-180, 180, dx):
+        for max_y in range(0, math.ceil(df[wind_features[1]].max()), dy):
             binned_df = df.query('{0} >= {2} and {0} < {2}+{4} and {1} >= {3} and {1} < {3}+{5}'.format(wind_features[0], wind_features[1], max_x, max_y, dx, dy))
             bin_size = len(binned_df.index)
             bin_corr = compute_corr(binned_df.drop([x[1] for x in exclude], axis=1), target_feature)
@@ -71,8 +69,6 @@ def create_bins(df, wind_features, target_feature, dx=5, dy=2, min_thresh=5, exc
                 print('Bin {} created!'.format(bin_name))
                 print('Bin size: {}.'.format(bin_size))
                 bins[bin_name] = {'bin': binned_df, 'size': bin_size, 'corr': bin_corr}
-            max_y+=dy
-        max_x+=dx
     print('{} bins created!'.format(len(bins)))
     return bins, dx, dy, max_x, max_y
 
