@@ -40,7 +40,7 @@ def preprocess_data(df, identifier_cols, cols_to_preprocess, other_cols, regex):
     print('Preprocessing completed!')
     return preprocessed_df
 
-def compute_corr(df, target_feature, num_features=50):
+def compute_corr(df, target_feature, num_features=20):
     """Compute top correlated features with the target feature"""
     corrs = {}
     for col in df.columns:
@@ -117,9 +117,9 @@ def plot_corr(df, corr, base_path, fname):
     path = '{}/{}.pdf'.format(base_path, fname)
     create_if_not_exist(base_path)
     print('Saving plot to {}.'.format(path))
-    sns.heatmap(corr, xticklabels=corr.columns, yticklabels=corr.columns)
-    plt.xticks(rotation=30, ha='right', fontsize=3)
-    plt.yticks(fontsize=3)
+    sns.heatmap(corr, xticklabels=corr.columns, yticklabels=corr.columns, lw=.75)
+    plt.xticks(rotation=30, ha='right', fontsize=5)
+    plt.yticks(fontsize=5)
     plt.tight_layout()
     plt.savefig(path)
     plt.clf()
