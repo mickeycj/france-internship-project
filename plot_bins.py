@@ -112,7 +112,7 @@ def plot_boxplot(df, target_feature, axis_name, base_path, fname):
     plt.savefig(path)
     plt.clf()
 
-def plot_corr(df, corr, base_path, fname):
+def plot_corr(corr, base_path, fname):
     """Plot the correlations with boat speed"""
     path = '{}/{}.pdf'.format(base_path, fname)
     create_if_not_exist(base_path)
@@ -173,7 +173,7 @@ for bin_name, bin_items in bins.items():
     dx, dy = (x_finish-x_start)/4.0, (y_finish-y_start)/4.0
     plot_wind_angle_speed(binned_df, [x[1] for x in wind_features], bins_axis_names, x_start, y_start, x_finish, y_finish, dx, dy, 3, bin_reports_path, 'bin')
     plot_boxplot(binned_df, boat_speed_feature[1], boxplot_axis_name, bin_reports_path, 'boxplot')
-    plot_corr(binned_df, bin_corr, bin_reports_path, 'corr')
+    plot_corr(bin_corr, bin_reports_path, 'corr')
 print('All plots saved!')
 
 print('------------------------------------------')
