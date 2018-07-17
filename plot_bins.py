@@ -66,9 +66,9 @@ def create_bins(df, wind_features, target_feature, dx=5, dy=2, min_thresh=5, exc
             bin_corr = compute_corr(binned_df.drop(exclude, axis=1), target_feature)
             if bin_size >= min_thresh and bin_corr is not None:
                 bin_name = 'bin_x{}to{}_y{}to{}'.format(max_x, max_x+dx, max_y, max_y+dy)
+                bins[bin_name] = {'bin': binned_df, 'size': bin_size, 'corr': bin_corr}
                 print('Bin {} created!'.format(bin_name))
                 print('Bin size: {}.'.format(bin_size))
-                bins[bin_name] = {'bin': binned_df, 'size': bin_size, 'corr': bin_corr}
     print('{} bins created!'.format(len(bins)))
     return bins, dx, dy, max_x, max_y
 
