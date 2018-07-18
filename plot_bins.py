@@ -16,7 +16,7 @@ from statistics import median
 from constants import bins_axis_names, bin_dimensions_regex, boat_speed_feature, \
                     boxplot_axis_name, feature_regex, identifier_features, \
                     fiber_optics_structure_features, fiber_optics_appendix_features, \
-                    other_sensor_features, wind_features
+                    other_sensor_features, statistics_features, wind_features
 
 def read_csv(fnames):
     """Read CSV file(s) to a Pandas Dataframe"""
@@ -30,7 +30,11 @@ def read_csv(fnames):
     print('Dataframe created!')
     return df
 
-def preprocess_data(df, identifier_cols, cols_to_preprocess, other_cols, regex):
+def preprocess_data(df,
+                identifier_cols=identifier_features,
+                cols_to_preprocess=fiber_optics_structure_features + fiber_optics_appendix_features,
+                other_cols=other_sensor_features + wind_features + [boat_speed_feature],
+                regex=feature_regex):
     """Preprocess the dataset"""
     print('Preprocessing data...')
     preprocessed_df = pd.DataFrame()
@@ -47,7 +51,7 @@ def sort_corr(corr, num_features=20):
     sorted_corr = sorted(corr.items(), key=lambda x: abs(x[1]), reverse=True)[:num_features]
     return sorted(sorted_corr, key=lambda x: x[1], reverse=True)
 
-def compute_sorted_corr(df, target_feature, num_features=20):
+def compute_sorted_corr(df, target_feature=boat_speed_feature[1], num_features=20):
     """Compute sorted correlated features with the target feature"""
     corr = {}
     for col in df.columns:
@@ -60,7 +64,12 @@ def compute_sorted_corr(df, target_feature, num_features=20):
         return None, None
     return df[cols].corr(), corr
 
-def create_bins(df, wind_features, target_feature, dx=5, dy=2, min_thresh=5, exclude=[]):
+def create_bins(df,
+                wind_features=[x[1] for x in wind_features],
+                target_feature=boat_speed_feature[1],
+                statistics_cols=statistics_features,
+                dx=5, dy=2, min_thresh=5,
+                exclude=[x[1] for x in identifier_features + wind_features]):
     """Create bins"""
     print('Creating bins with size {}˚ by {} knots...'.format(dx, dy))
     bins, corr = {}, {}
@@ -68,7 +77,7 @@ def create_bins(df, wind_features, target_feature, dx=5, dy=2, min_thresh=5, exc
         for max_y in range(0, math.ceil(df[wind_features[1]].max()), dy):
             binned_df = df.query('{0} >= {2} and {0} < {2}+{4} and {1} >= {3} and {1} < {3}+{5}'.format(wind_features[0], wind_features[1], max_x, max_y, dx, dy))
             bin_size = len(binned_df.index)
-            bin_corr, unsorted_corr = compute_sorted_corr(binned_df.drop(exclude, axis=1), target_feature)
+            bin_corr, unsorted_corr = compute_sorted_corr(binned_df.drop(exclude, axis=1))
             if bin_size >= min_thresh and bin_corr is not None:
                 bin_name = 'bin_x{}to{}_y{}to{}'.format(max_x, max_x+dx, max_y, max_y+dy)
                 for col, c_corr in unsorted_corr.items():
@@ -80,7 +89,7 @@ def create_bins(df, wind_features, target_feature, dx=5, dy=2, min_thresh=5, exc
                 print('Bin {} created!'.format(bin_name))
                 print('Bin size: {}.'.format(bin_size))
     print('{} bins created!'.format(len(bins)))
-    return bins, dx, dy, max_x, max_y, pd.DataFrame(data=sort_corr({col: median(c_corr) for col, c_corr in corr.items()}), columns=['Feature', 'Corr'])
+    return bins, dx, dy, max_x, max_y, pd.DataFrame(data=sort_corr({col: median(c_corr) for col, c_corr in corr.items()}), columns=statistics_cols)
 
 def create_if_not_exist(path):
     """Create a directory if not exist"""
@@ -88,7 +97,7 @@ def create_if_not_exist(path):
         os.makedirs(path)
         print('Directory {} created!'.format(path))
 
-def plot_wind_angle_speed(df, wind_features, axis_names, x_start, y_start, x_finish, y_finish, dx, dy, markersize, base_path, fname, main=False):
+def plot_wind_angle_speed(df, x_start, y_start, x_finish, y_finish, dx, dy, markersize, base_path, fname, wind_features=[x[1] for x in wind_features], axis_names=bins_axis_names, main=False):
     """Plot the wind angle-speed space"""
     create_if_not_exist(base_path)
     path = '{}/{}.pdf'.format(base_path, fname)
@@ -110,7 +119,7 @@ def plot_wind_angle_speed(df, wind_features, axis_names, x_start, y_start, x_fin
     plt.savefig(path)
     plt.clf()
 
-def plot_boxplot(df, target_feature, axis_name, base_path, fname):
+def plot_boxplot(df, base_path, fname, target_feature=boat_speed_feature[1], axis_name=boxplot_axis_name):
     """Plot the boxplot for boat speed"""
     create_if_not_exist(base_path)
     path = '{}/{}.pdf'.format(base_path, fname)
@@ -160,21 +169,17 @@ df = read_csv(map(lambda fname: '{}/{}.csv'.format(data_path, fname), fnames))
 
 # Preprocess the dataset.
 print('------------------------------------------')
-df = preprocess_data(df,
-                    identifier_features,
-                    fiber_optics_structure_features + fiber_optics_appendix_features,
-                    other_sensor_features + wind_features + [boat_speed_feature],
-                    feature_regex)
+df = preprocess_data(df)
 
 # Create the bins.
 print('------------------------------------------')
-bins, dx, dy, _, max_y, sorted_corr_df = create_bins(df, [x[1] for x in wind_features], boat_speed_feature[1], exclude=[x[1] for x in identifier_features + wind_features])
+bins, dx, dy, _, max_y, sorted_corr_df = create_bins(df)
 
 # Plot and save the bins.
 print('------------------------------------------')
 print('Creating plots...')
 reports_path = './reports/{}'.format(version)
-plot_wind_angle_speed(df, [x[1] for x in wind_features], bins_axis_names, -180, 0, 180+1, max_y+1, dx, dy, 0.25, reports_path, 'bins', main=True)
+plot_wind_angle_speed(df, -180, 0, 180+1, max_y+1, dx, dy, 0.25, reports_path, 'bins', main=True)
 sorted_corr_df.to_csv('{}/corr.csv'.format(reports_path), index=False)
 reports_path = '{}/bins'.format(reports_path)
 for bin_name, bin_items in bins.items():
@@ -182,8 +187,8 @@ for bin_name, bin_items in bins.items():
     bin_reports_path = '{}/{}'.format(reports_path, bin_name)
     x_start, x_finish, y_start, y_finish = [int(s) for s in re.findall(bin_dimensions_regex, bin_name)]
     dx, dy = (x_finish-x_start)/4.0, (y_finish-y_start)/4.0
-    plot_wind_angle_speed(binned_df, [x[1] for x in wind_features], bins_axis_names, x_start, y_start, x_finish, y_finish, dx, dy, 3, bin_reports_path, 'bin')
-    plot_boxplot(binned_df, boat_speed_feature[1], boxplot_axis_name, bin_reports_path, 'boxplot')
+    plot_wind_angle_speed(binned_df, x_start, y_start, x_finish, y_finish, dx, dy, 3, bin_reports_path, 'bin')
+    plot_boxplot(binned_df, bin_reports_path, 'boxplot')
     plot_corr(bin_corr, bin_reports_path, 'corr')
 print('All plots saved!')
 

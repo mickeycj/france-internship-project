@@ -161,3 +161,6 @@ boxplot_axis_name = 'Boat Speed (knots)'
 # Regular expressions.
 feature_regex = r'.*{}.*'
 bin_dimensions_regex = r'[+-]?\d+'
+
+# Other features.
+statistics_features = ['Feature', 'Corr']
