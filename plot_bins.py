@@ -35,10 +35,10 @@ def preprocess_data(df, identifier_cols, cols_to_preprocess, other_cols, regex):
     print('Preprocessing data...')
     preprocessed_df = pd.DataFrame()
     for old_col, new_col in identifier_cols + cols_to_preprocess + other_cols:
-        if (old_col, new_col) not in identifier_cols + other_cols:
-            preprocessed_df[new_col] = df.filter(regex=(regex.format(old_col))).mean(axis=1)
-        else:
+        if (old_col, new_col) in identifier_cols + other_cols:
             preprocessed_df[new_col] = df[old_col]
+        else:
+            preprocessed_df[new_col] = df.filter(regex=(regex.format(old_col))).mean(axis=1)
     print('Preprocessing completed!')
     return preprocessed_df
 
