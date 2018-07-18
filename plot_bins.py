@@ -168,14 +168,14 @@ df = preprocess_data(df,
 
 # Create the bins.
 print('------------------------------------------')
-bins, dx, dy, _, max_y, sorted_corr = create_bins(df, [x[1] for x in wind_features], boat_speed_feature[1], exclude=[x[1] for x in identifier_features + wind_features])
+bins, dx, dy, _, max_y, sorted_corr_df = create_bins(df, [x[1] for x in wind_features], boat_speed_feature[1], exclude=[x[1] for x in identifier_features + wind_features])
 
 # Plot and save the bins.
 print('------------------------------------------')
 print('Creating plots...')
 reports_path = './reports/{}'.format(version)
 plot_wind_angle_speed(df, [x[1] for x in wind_features], bins_axis_names, -180, 0, 180+1, max_y+1, dx, dy, 0.25, reports_path, 'bins', main=True)
-sorted_corr.to_csv('{}/corr.csv'.format(reports_path), index=False)
+sorted_corr_df.to_csv('{}/corr.csv'.format(reports_path), index=False)
 reports_path = '{}/bins'.format(reports_path)
 for bin_name, bin_items in bins.items():
     binned_df, bin_corr = bin_items['bin'], bin_items['corr']
