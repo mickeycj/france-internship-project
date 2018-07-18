@@ -180,7 +180,7 @@ print('------------------------------------------')
 print('Creating plots...')
 reports_path = './reports/{}'.format(version)
 plot_wind_angle_speed(df, -180, 0, 180+1, max_y+1, dx, dy, 0.25, reports_path, 'bins', main=True)
-sorted_corr_df.to_csv('{}/corr.csv'.format(reports_path), index=False)
+sorted_corr_df.to_csv('{}/corr.csv'.format(reports_path), sep=';', index=False)
 reports_path = '{}/bins'.format(reports_path)
 for bin_name, bin_items in bins.items():
     binned_df, bin_corr = bin_items['bin'], bin_items['corr']
