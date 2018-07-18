@@ -80,7 +80,7 @@ def create_bins(df, wind_features, target_feature, dx=5, dy=2, min_thresh=5, exc
                 print('Bin {} created!'.format(bin_name))
                 print('Bin size: {}.'.format(bin_size))
     print('{} bins created!'.format(len(bins)))
-    return bins, dx, dy, max_x, max_y, pd.DataFrame(data=sort_corr({col: median(c_corr) for col, c_corr in corr.items()}, num_features=30), columns=['Feature', 'Corr'])
+    return bins, dx, dy, max_x, max_y, pd.DataFrame(data=sort_corr({col: median(c_corr) for col, c_corr in corr.items()}), columns=['Feature', 'Corr'])
 
 def create_if_not_exist(path):
     """Create a directory if not exist"""
