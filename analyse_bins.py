@@ -57,7 +57,7 @@ if __name__ == '__main__':
     # Plot and save the bins.
     print('------------------------------------------')
     print('Creating plots...')
-    reports_path = './analysis_reports/{}'.format(version)
+    reports_path = './reports/{}/analysis'.format(version)
     for bin_name, bin_items in { key: bins[key] for key in bin_keys }.items():
         binned_df, bin_corr = bin_items['bin'], bin_items['corr']
         bin_reports_path = '{}/{}'.format(reports_path, bin_name)

@@ -179,7 +179,7 @@ if __name__ == '__main__':
     # Plot and save the bins.
     print('------------------------------------------')
     print('Creating plots...')
-    reports_path = './reports/{}'.format(version)
+    reports_path = './reports/{}/initial'.format(version)
     plot_wind_angle_speed(df, -180, 0, 180+1, max_y+1, dx, dy, 0.25, reports_path, 'bins', main=True)
     sorted_corr_df.to_csv('{}/corr.csv'.format(reports_path), sep=';', index=False)
     reports_path = '{}/bins'.format(reports_path)
