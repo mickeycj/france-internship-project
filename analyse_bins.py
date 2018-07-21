@@ -164,11 +164,11 @@ print('Setting up data path...')
 data_path = './data/{}'.format(version)
 
 # Bins to analyse.
-bin_keys = ['bin_x{}to{}_y{}to{}'.format(x_min, x_max, y_min, y_max) for x_min, x_max, y_min, y_max in [(135, 140, 20, 22),
-                                                                                                        (45, 50, 14, 16),
-                                                                                                        (-140, -135, 20, 22),
-                                                                                                        (-50, -45, 14, 16),
-                                                                                                        (-90, -85, 8, 10)]]
+bin_keys = ['bin_x{}to{}_y{}to{}'.format(x_min, x_max, y_min, y_max) for x_min, x_max, y_min, y_max in [(140, 145, 22, 24),
+                                                                                                        (50, 55, 16, 18),
+                                                                                                        (-145, -140, 22, 24),
+                                                                                                        (-55, -50, 16, 18),
+                                                                                                        (-95, -90, 10, 12)]]
 
 # Read from CSV file(s).
 print('------------------------------------------')
