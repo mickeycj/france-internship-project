@@ -2,5 +2,6 @@
 /.ipynb_checkpoints
 /.vscode
 /data
+/analysis_reports
 /reports
 .DS_Store
