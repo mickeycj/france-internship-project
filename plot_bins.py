@@ -143,54 +143,55 @@ def plot_corr(corr, base_path, fname):
     plt.savefig(path)
     plt.clf()
 
-print('Initializing bins creation...')
-print('------------------------------------------')
+if __name__ == '__main__':
+    print('Initializing bins creation...')
+    print('------------------------------------------')
 
-# Command line arguments.
-print('Retrieving command line arguments...')
-version = sys.argv[1]
-fnames = sys.argv[2:]
+    # Command line arguments.
+    print('Retrieving command line arguments...')
+    version = sys.argv[1]
+    fnames = sys.argv[2:]
 
-# Ignore RunTimeWarning.
-print('Setting up warning...')
-warnings.filterwarnings('ignore')
+    # Ignore RunTimeWarning.
+    print('Setting up warning...')
+    warnings.filterwarnings('ignore')
 
-# Ignore PyPlot warning.
-print('Setting up PyPlot...')
-plt.rcParams.update({'figure.max_open_warning': 0})
+    # Ignore PyPlot warning.
+    print('Setting up PyPlot...')
+    plt.rcParams.update({'figure.max_open_warning': 0})
 
-# Data path.
-print('Setting up data path...')
-data_path = './data/{}'.format(version)
+    # Data path.
+    print('Setting up data path...')
+    data_path = './data/{}'.format(version)
 
-# Read from CSV file(s).
-print('------------------------------------------')
-df = read_csv(map(lambda fname: '{}/{}.csv'.format(data_path, fname), fnames))
+    # Read from CSV file(s).
+    print('------------------------------------------')
+    df = read_csv(map(lambda fname: '{}/{}.csv'.format(data_path, fname), fnames))
 
-# Preprocess the dataset.
-print('------------------------------------------')
-df = preprocess_data(df)
+    # Preprocess the dataset.
+    print('------------------------------------------')
+    df = preprocess_data(df)
 
-# Create the bins.
-print('------------------------------------------')
-bins, dx, dy, _, max_y, sorted_corr_df = create_bins(df)
+    # Create the bins.
+    print('------------------------------------------')
+    bins, dx, dy, _, max_y, sorted_corr_df = create_bins(df)
 
-# Plot and save the bins.
-print('------------------------------------------')
-print('Creating plots...')
-reports_path = './reports/{}'.format(version)
-plot_wind_angle_speed(df, -180, 0, 180+1, max_y+1, dx, dy, 0.25, reports_path, 'bins', main=True)
-sorted_corr_df.to_csv('{}/corr.csv'.format(reports_path), sep=';', index=False)
-reports_path = '{}/bins'.format(reports_path)
-for bin_name, bin_items in bins.items():
-    binned_df, bin_corr = bin_items['bin'], bin_items['corr']
-    bin_reports_path = '{}/{}'.format(reports_path, bin_name)
-    x_start, x_finish, y_start, y_finish = [int(s) for s in re.findall(bin_dimensions_regex, bin_name)]
-    dx, dy = (x_finish-x_start)/4.0, (y_finish-y_start)/4.0
-    plot_wind_angle_speed(binned_df, x_start, y_start, x_finish, y_finish, dx, dy, 3, bin_reports_path, 'bin')
-    plot_boxplot(binned_df, bin_reports_path, 'boxplot')
-    plot_corr(bin_corr, bin_reports_path, 'corr')
-print('All plots saved!')
+    # Plot and save the bins.
+    print('------------------------------------------')
+    print('Creating plots...')
+    reports_path = './reports/{}'.format(version)
+    plot_wind_angle_speed(df, -180, 0, 180+1, max_y+1, dx, dy, 0.25, reports_path, 'bins', main=True)
+    sorted_corr_df.to_csv('{}/corr.csv'.format(reports_path), sep=';', index=False)
+    reports_path = '{}/bins'.format(reports_path)
+    for bin_name, bin_items in bins.items():
+        binned_df, bin_corr = bin_items['bin'], bin_items['corr']
+        bin_reports_path = '{}/{}'.format(reports_path, bin_name)
+        x_start, x_finish, y_start, y_finish = [int(s) for s in re.findall(bin_dimensions_regex, bin_name)]
+        dx, dy = (x_finish-x_start)/4.0, (y_finish-y_start)/4.0
+        plot_wind_angle_speed(binned_df, x_start, y_start, x_finish, y_finish, dx, dy, 3, bin_reports_path, 'bin')
+        plot_boxplot(binned_df, bin_reports_path, 'boxplot')
+        plot_corr(bin_corr, bin_reports_path, 'corr')
+    print('All plots saved!')
 
-print('------------------------------------------')
-print('Bins creation finished!')
+    print('------------------------------------------')
+    print('Bins creation finished!')
