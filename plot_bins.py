@@ -43,7 +43,6 @@ def preprocess_data(df,
             preprocessed_df[new_col] = df[old_col]
         else:
             preprocessed_df[new_col] = df.filter(regex=(regex.format(old_col))).mean(axis=1)
-    preprocessed_df.fillna(0, inplace=True)
     print('Preprocessing completed!')
     return preprocessed_df
 
