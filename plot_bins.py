@@ -76,7 +76,9 @@ def create_bins(df,
     bins, corr = {}, {}
     for max_x in range(-180, 180, dx):
         for max_y in range(0, math.ceil(df[wind_features[1]].max()), dy):
-            binned_df = df.query('{0} >= {2} and {0} < {2}+{4} and {1} >= {3} and {1} < {3}+{5}'.format(wind_features[0], wind_features[1], max_x, max_y, dx, dy))
+            binned_df = df.query('{0} >= {2} and {0} < {2}+{4} and {1} >= {3} and {1} < {3}+{5}'.format(wind_features[0], wind_features[1],
+                                                                                                        max_x, max_y,
+                                                                                                        dx, dy))
             bin_size = len(binned_df.index)
             bin_corr, unsorted_corr = compute_sorted_corr(binned_df.drop(exclude, axis=1))
             if bin_size >= min_thresh and bin_corr is not None:
@@ -90,7 +92,11 @@ def create_bins(df,
                 print('Bin {} created!'.format(bin_name))
                 print('Bin size: {}.'.format(bin_size))
     print('{} bins created!'.format(len(bins)))
-    return bins, dx, dy, max_x, max_y, pd.DataFrame(data=sort_corr({col: median(c_corr) for col, c_corr in corr.items()}), columns=statistics_cols)
+    return bins, \
+        dx, dy, \
+        max_x, max_y, \
+        pd.DataFrame(data=sort_corr({col: median(c_corr) for col, c_corr in corr.items()}),
+                    columns=statistics_cols)
 
 def create_if_not_exist(path):
     """Create a directory if not exist"""
@@ -98,7 +104,15 @@ def create_if_not_exist(path):
         os.makedirs(path)
         print('Directory {} created!'.format(path))
 
-def plot_wind_angle_speed(df, x_start, y_start, x_finish, y_finish, dx, dy, markersize, base_path, fname, wind_features=[x[1] for x in wind_features], axis_names=bins_axis_names, main=False):
+def plot_wind_angle_speed(df,
+                        x_start, y_start,
+                        x_finish, y_finish,
+                        dx, dy,
+                        markersize,
+                        base_path, fname,
+                        wind_features=[x[1] for x in wind_features],
+                        axis_names=bins_axis_names,
+                        main=False):
     """Plot the wind angle-speed space"""
     create_if_not_exist(base_path)
     path = '{}/{}.pdf'.format(base_path, fname)
@@ -120,12 +134,17 @@ def plot_wind_angle_speed(df, x_start, y_start, x_finish, y_finish, dx, dy, mark
     plt.savefig(path)
     plt.clf()
 
-def plot_boxplot(df, base_path, fname, target_feature=boat_speed_feature[1], axis_name=boxplot_axis_name):
+def plot_boxplot(df,
+                base_path, fname,
+                target_feature=boat_speed_feature[1],
+                axis_name=boxplot_axis_name):
     """Plot the boxplot for boat speed"""
     create_if_not_exist(base_path)
     path = '{}/{}.pdf'.format(base_path, fname)
     print('Saving plot to {}.'.format(path))
-    ax = df.boxplot(column=target_feature, showfliers=df[target_feature].median() == df[target_feature].mode().iloc[0], return_type='axes')
+    ax = df.boxplot(column=target_feature,
+                    showfliers=df[target_feature].median() == df[target_feature].mode().iloc[0],
+                    return_type='axes')
     ax.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
     ax.set_ylabel(axis_name)
     plt.tight_layout()
