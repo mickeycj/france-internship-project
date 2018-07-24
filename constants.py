@@ -157,6 +157,7 @@ wind_features = [
 boat_speed_feature = ('VarFilter_WTP_SelBoatSpd', 'Boat_Speed')
 bins_axis_names = ['Wind Angle (˚)', 'Wind Speed (knots)']
 boxplot_axis_name = 'Boat Speed (knots)'
+coc_feature_name = 'Feature'
 
 # Regular expressions.
 feature_regex = r'.*{}.*'
