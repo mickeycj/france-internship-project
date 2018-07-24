@@ -46,7 +46,7 @@ def preprocess_data(df,
     print('Preprocessing completed!')
     return preprocessed_df
 
-def sort_corr(corr, num_features=20):
+def sort_corr(corr, num_features):
     """Sort correlation dictionary"""
     sorted_corr = sorted(corr.items(), key=lambda x: abs(x[1]), reverse=True)[:num_features]
     return sorted(sorted_corr, key=lambda x: x[1], reverse=True)
@@ -59,7 +59,7 @@ def compute_sorted_corr(df, target_feature=boat_speed_feature[1], num_features=2
             f_corr = df[target_feature].corr(df[col])
             if not math.isnan(f_corr):
                 corr[col] = f_corr
-    cols = [target_feature] + [x[0] for x in sort_corr(corr)]
+    cols = [target_feature] + [x[0] for x in sort_corr(corr, num_features)]
     if len(cols) <= 1:
         return None, None
     return df[cols].corr(), corr
