@@ -34,10 +34,14 @@ def create_PCA(df,
     df.dropna(axis=1, how='all', inplace=True)
     df.replace([np.inf, -np.inf], np.nan, inplace=True)
     df.fillna(df.mean(), inplace=True)
-    X, y = StandardScaler().fit_transform(df.drop(target_feature, axis=1).reset_index()), df[target_feature].reset_index()
+    X = df.drop(target_feature, axis=1).reset_index()
+    X, y = StandardScaler().fit_transform(X), df[target_feature].reset_index()
     pca = PCA(var_thresh)
     principal_components = pca.fit_transform(X)
-    return pca, pd.concat([pd.DataFrame(data=principal_components, columns=[column_name.format(i+1) for i in range(0, len(principal_components[0]))]), y], axis=1).drop(['index'], axis=1)
+    columns = [column_name.format(i+1) for i in range(0, len(principal_components[0]))]
+    pca_df = pd.DataFrame(data=principal_components, columns=columns)
+    pca_df = pd.concat([pca_df, y])
+    return pca, pca_df
 
 def create_bins(df,
                 wind_features=[x[1] for x in wind_features],
@@ -51,30 +55,30 @@ def create_bins(df,
     bins = {}
     for max_x in range(-180, 180, dx):
         for max_y in range(0, math.ceil(df[wind_features[1]].max()), dy):
-            binned_df = df.query('{0} >= {2} and {0} < {2}+{4} and {1} >= {3} and {1} < {3}+{5}'.format(wind_features[0], wind_features[1],
-                                                                                                        max_x, max_y,
-                                                                                                        dx, dy))
+            query = '{0} >= {2} and {0} < {2}+{4} and {1} >= {3} and {1} < {3}+{5}' \
+                        .format(wind_features[0], wind_features[1], max_x, max_y, dx, dy)
+            binned_df = df.query(query)
             bin_name = 'bin_x{}to{}_y{}to{}'.format(max_x, max_x+dx, max_y, max_y+dy)
             if bin_name in target_bins:
                 bin_size = len(binned_df.index)
                 bin_corr, unsorted_corr = compute_sorted_corr(binned_df.drop(exclude, axis=1))
                 if bin_size >= min_thresh and bin_corr is not None:
                     pca, pca_df = create_PCA(binned_df)
-                    bins[bin_name] = {'bin': binned_df,
-                                    'size': bin_size,
-                                    'corr': bin_corr,
-                                    'corr_list': pd.DataFrame(data=sort_corr(unsorted_corr, num_features=50), columns=statistics_cols),
-                                    'pca': pca,
-                                    'pca_df': pca_df}
+                    bins[bin_name] = {
+                        'bin': binned_df,
+                        'size': bin_size,
+                        'corr': bin_corr,
+                        'corr_list': pd.DataFrame(data=sort_corr(unsorted_corr, num_features=50),
+                                                columns=statistics_cols),
+                        'pca': pca,
+                        'pca_df': pca_df
+                    }
                     print('Bin {} created!'.format(bin_name))
                     print('Bin size: {}.'.format(bin_size))
     print('{} bins created!'.format(len(bins)))
     return bins, dx, dy, max_x, max_y
 
-def plot_circle_of_correlations(pc_infos,
-                            ebouli,
-                            pairs,
-                            columns,
+def plot_circle_of_correlations(pc_infos, ebouli, pairs, columns,
                             base_path, plot_fname, guide_fname,
                             feature_name=coc_feature_name):
     """Plot the circle of correlation"""
@@ -84,28 +88,29 @@ def plot_circle_of_correlations(pc_infos,
     print('Saving plot to {}.'.format(plot_path))
     print('Saving guide to {}.'.format(guide_path))
     (pc_1, pc_2) = pairs
+    pc_1, pc_2 = 'PC_{}'.format(pc_1), 'PC_{}'.format(pc_2)
     pc_infos[feature_name] = columns[:len(pc_infos.index)]
-    pc_infos.sort_values(by=['PC_{}'.format(pc_1)], ascending=False, inplace=True)
+    pc_infos.sort_values(by=[pc_1], ascending=False, inplace=True)
+    guide_df = pd.DataFrame(data={'Label': [label+1 for label in range(len(pc_infos.index))],
+                               'Feature': [feature for feature in pc_infos[feature_name].values[:len(pc_infos.index)]]})
     plt.Circle((0,0), radius=10, color='g', fill=False)
     circle1 = plt.Circle((0, 0), radius=1, color='g', fill=False)
     fig = plt.gcf()
     fig.gca().add_artist(circle1)
-    for idx in range(len(pc_infos['PC_{}'.format(pc_1)])):
-        x = pc_infos['PC_{}'.format(pc_1)][idx]
-        y = pc_infos['PC_{}'.format(pc_2)][idx]
+    for idx in range(len(pc_infos[pc_1])):
+        x = pc_infos[pc_1][idx]
+        y = pc_infos[pc_2][idx]
         plt.plot([0.0, x], [0.0, y], 'k-')
         plt.plot(x, y, 'rx')
         plt.annotate(pc_infos.index[idx], xy=(x, y), fontsize=7.5)
-    plt.xlabel('{} ({}%%)'.format('PC_{}'.format(pc_1), str(ebouli[0])[:4].lstrip('0.')))
-    plt.ylabel('{} ({}%%)'.format('PC_{}'.format(pc_2), str(ebouli[1])[:4].lstrip('0.')))
+    plt.xlabel('{} ({}%%)'.format(pc_1, str(ebouli[0])[:4].lstrip('0.')))
+    plt.ylabel('{} ({}%%)'.format(pc_2, str(ebouli[1])[:4].lstrip('0.')))
     plt.xlim((-1, 1))
     plt.ylim((-1, 1))
     plt.tight_layout()
     plt.savefig(plot_path)
     plt.clf()
-    pd.DataFrame(data={'Label': [label+1 for label in range(len(pc_infos.index))],
-                    'Feature': [feature for feature in pc_infos[feature_name].values[:len(pc_infos.index)]]}) \
-                .to_csv(guide_path, sep=';', index=False)
+    guide_df.to_csv(guide_path, sep=';', index=False)
 
 if __name__ == '__main__':
     print('Initializing bins analysis...')
@@ -160,12 +165,12 @@ if __name__ == '__main__':
             for pc_2 in range(pc_1, 5+1):
                 if pc_1 != pc_2:
                     ebouli = pd.Series(bin_pca.explained_variance_ratio_)
-                    plot_circle_of_correlations(pd.DataFrame(np.transpose(bin_pca.components_),
-                                                        columns=['PC_{}'.format(i) for i in range(len(ebouli))]),
-                                        ebouli,
-                                        (pc_1, pc_2),
-                                        binned_df.drop([x[1] for x in identifier_features + wind_features], axis=1).columns.values,
-                                        circle_of_corr_reports_path, 'coc_{}_{}'.format(pc_1, pc_2), 'guide_{}_{}'.format(pc_1, pc_2))
+                    pc_infos = pd.DataFrame(np.transpose(bin_pca.components_),
+                                            columns=['PC_{}'.format(i) for i in range(len(ebouli))])
+                    columns = binned_df.drop([x[1] for x in identifier_features + wind_features], axis=1).columns.values
+                    plot_fname, guide_fname = 'coc_{}_{}'.format(pc_1, pc_2), 'guide_{}_{}'.format(pc_1, pc_2)
+                    plot_circle_of_correlations(pc_infos, ebouli, (pc_1, pc_2), columns,
+                                                circle_of_corr_reports_path, plot_fname, guide_fname)
     print('All plots saved!')
 
     print('------------------------------------------')
