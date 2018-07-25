@@ -40,7 +40,7 @@ def create_PCA(df,
     principal_components = pca.fit_transform(X)
     columns = [column_name.format(i+1) for i in range(0, len(principal_components[0]))]
     pca_df = pd.DataFrame(data=principal_components, columns=columns)
-    pca_df = pd.concat([pca_df, y])
+    pca_df = pd.concat([pca_df, y], axis=1).drop(['index'], axis=1)
     return pca, pca_df
 
 def create_bins(df,
